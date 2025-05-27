@@ -1,13 +1,9 @@
 import { Expose } from 'class-transformer'
-import { IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsNumber, IsString } from 'class-validator'
 
 export class SignInDTO {
   @IsString()
-  phone_number: string
-
-  @IsString()
-  @IsOptional()
-  email?: string
+  email: string
 
   @IsNumber()
   code: number

@@ -8,6 +8,8 @@ import * as crypto from 'node:crypto'
 import { OTP } from 'src/models/otp.schema'
 import { User } from 'src/models/user.schema'
 
+import { EntityStatus } from 'src/common/enums/status.enum'
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -42,41 +44,23 @@ export class AuthService {
     return this.otpModel.findByIdAndDelete(id)
   }
 
-  async getUserByPhoneNumber(phone_number: string) {
-    const user = await this.userModel.findOneAndUpdate(
-      {
-        phone_number,
-        is_deleted: false,
-      },
-      { auth_method: 'phone-number' },
-    )
-
-    return user
-  }
-
   async getUserByEmail(email: string) {
     const user = await this.userModel
       .findOne({
         email,
-        is_deleted: false,
+        status: EntityStatus.ACTIVE,
       })
       .select('+password')
 
     return user
   }
 
-  async signIn({ phone_number, email, auth_method }: User) {
-    const filter = { auth_method, is_deleted: { $ne: true } }
-
-    if (auth_method == 'phone-number') {
-      filter['phone_number'] = phone_number
-    } else {
-      filter['email'] = email
-    }
+  async signIn({ email }: Partial<User>) {
+    const filter = { email, status: EntityStatus.ACTIVE }
 
     const user = await this.userModel.findOneAndUpdate(
       filter,
-      { phone_number, email, auth_method },
+      { email },
       { upsert: true, new: true },
     )
 
@@ -86,7 +70,7 @@ export class AuthService {
   async getUser(id: Types.ObjectId) {
     const user = await this.userModel.findOne({
       _id: id,
-      is_deleted: false,
+      status: EntityStatus.ACTIVE,
     })
 
     return user

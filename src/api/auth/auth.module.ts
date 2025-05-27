@@ -5,7 +5,6 @@ import { OTP, OTPSchema } from 'src/models/otp.schema'
 import { User, UserSchema } from 'src/models/user.schema'
 
 import { EmailService } from 'src/services/email.service'
-import { SmsService } from 'src/services/sms.service'
 
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
@@ -17,7 +16,7 @@ import { AuthService } from './auth.service'
     MongooseModule.forFeature([{ name: OTP.name, schema: OTPSchema }]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, SmsService, EmailService],
+  providers: [AuthService, EmailService],
   exports: [AuthService],
 })
 export class AuthModule {}

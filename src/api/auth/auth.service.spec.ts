@@ -2,7 +2,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { Test, TestingModule } from '@nestjs/testing'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 
-import { User, UserSchema } from 'src/models/user.schema'
+import { User, UserSchema } from 'src/models/user.schema.ts__oil_tmp_399346'
 
 import { AuthService } from './auth.service'
 

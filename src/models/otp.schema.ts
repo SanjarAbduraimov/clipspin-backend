@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
 
-import { OTP_EXPIRES_IN } from 'src/constants'
+import { COLLECTION_TIMESTAMPS, OTP_EXPIRES_IN } from 'src/constants'
 
 export type OTPDocument = HydratedDocument<OTP>
 
-export const AUTH_METHODS = ['phone-number', 'email'] as const
-export type AuthMethod = (typeof AUTH_METHODS)[number]
-
-@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+@Schema({
+  timestamps: COLLECTION_TIMESTAMPS,
+  collection: 'otps',
+})
 export class OTP {
   @Prop()
   code: number
@@ -17,13 +17,7 @@ export class OTP {
   code_hash: string
 
   @Prop()
-  phone_number?: string
-
-  @Prop()
-  email?: string
-
-  @Prop({ type: String, enum: AUTH_METHODS })
-  auth_method: AuthMethod = 'phone-number'
+  email: string
 }
 
 export const OTPSchema = SchemaFactory.createForClass(OTP)

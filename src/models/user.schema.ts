@@ -1,27 +1,42 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import bcrypt from 'bcrypt'
 import { HydratedDocument } from 'mongoose'
 
-import { AUTH_METHODS, AuthMethod } from './otp.schema'
+import { EntityStatus } from 'src/common/enums/status.enum'
+import { COLLECTION_TIMESTAMPS } from 'src/constants'
 
 export type UserDocument = HydratedDocument<User>
 
-@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+@Schema({
+  timestamps: COLLECTION_TIMESTAMPS,
+  collection: 'users',
+})
 export class User {
   @Prop()
-  phone_number?: string
+  full_name?: string
 
   @Prop()
   email?: string
 
-  @Prop({ type: String, enum: AUTH_METHODS })
-  auth_method: AuthMethod = 'phone-number'
+  @Prop({ type: String, select: false })
+  password: string
 
-  @Prop({ default: false })
-  is_deleted?: boolean
+  @Prop({
+    type: String,
+    enum: EntityStatus,
+    default: EntityStatus.ACTIVE,
+  })
+  status?: EntityStatus = EntityStatus.ACTIVE
 
   @Prop()
   deleted_at?: Date
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
-UserSchema.index({ is_deleted: 1 })
+
+UserSchema.pre('save', async function (this: any, next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 12)
+  }
+  next()
+})

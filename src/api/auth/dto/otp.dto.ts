@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer'
-import { IsString } from 'class-validator'
+import { IsEmail, IsString } from 'class-validator'
 
 export class SendOTPPhoneNumberDTO {
   @IsString()
@@ -8,10 +8,14 @@ export class SendOTPPhoneNumberDTO {
 
 export class SendOTPPhoneEmailDTO {
   @IsString()
+  @IsEmail()
   email: string
 }
 
 export class OTPResponseDTO {
+  @Expose()
+  code: string
+
   @Expose()
   code_hash: string
 }
