@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { Queue } from 'bull'
 import { Types } from 'mongoose'
 
-export const ANALYZE_VIDEO_QUEUE_NAME = 'input-queue'
+export const ANALYZE_VIDEO_QUEUE_NAME = 'analyze-video-queue'
 
 export enum ANALYZE_VIDEO_QUEUE_EVENTS {
   UPLOAD_VIDEO = 'upload_video',

@@ -14,6 +14,10 @@ export const validation_schema = Joi.object({
   REDIS_HOST: Joi.string().required(),
   REDIS_PORT: Joi.number().default(6379),
   APIFY_TOKEN: Joi.string().required(),
+  OPEN_AI_API_KEY: Joi.string().required(),
+  FAL_AI_API_KEY: Joi.string().required(),
+  CREATOMATE_API_KEY: Joi.string().required(),
+  CREATOMATE_TEMPLATE_ID: Joi.string().required(),
 })
 
 export const configuration = () => ({
@@ -38,6 +42,16 @@ export const configuration = () => ({
   },
   google: {
     genai_api_key: process.env.GOOGLE_GEN_AI_API_KEY,
+  },
+  openai: {
+    api_key: process.env.OPEN_AI_API_KEY,
+  },
+  falai: {
+    api_key: process.env.FAL_AI_API_KEY,
+  },
+  creatomate: {
+    api_key: process.env.CREATOMATE_API_KEY,
+    template_id: process.env.CREATOMATE_TEMPLATE_ID,
   },
 })
 

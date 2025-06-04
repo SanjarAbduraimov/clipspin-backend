@@ -1,0 +1,31 @@
+import { BullModule } from '@nestjs/bull'
+import { Module } from '@nestjs/common'
+
+import { ProjectModule } from 'apps/backend/src/api/projects/project.module'
+
+import { CreatomateService } from '../../services/creatomate.service'
+import { FalAIService } from '../../services/falai.service'
+import { OpenAIService } from '../../services/openai.service'
+import { SlideGeneratorQueueProcessor } from './slide-generator.processor'
+import {
+  SLIDE_GENERATOR_QUEUE_NAME,
+  SlideGeneratorQueue,
+} from './slide-generator.queue'
+
+@Module({
+  imports: [
+    BullModule.registerQueue({
+      name: SLIDE_GENERATOR_QUEUE_NAME,
+    }),
+    ProjectModule,
+  ],
+  providers: [
+    OpenAIService,
+    FalAIService,
+    CreatomateService,
+    SlideGeneratorQueue,
+    SlideGeneratorQueueProcessor,
+  ],
+  exports: [SlideGeneratorQueue],
+})
+export class SlideGeneratorQueueModule {}

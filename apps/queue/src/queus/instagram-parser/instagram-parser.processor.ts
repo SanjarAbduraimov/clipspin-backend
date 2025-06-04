@@ -5,6 +5,11 @@ import { Job } from 'bull'
 import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 
+import {
+  ProjectProgress,
+  ProjectStatus,
+} from 'apps/backend/src/models/project.schema'
+
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
 import { AnalyzeVideoQueue } from '../analyze-video/analyze-video.queue'
@@ -88,6 +93,10 @@ export class InstagramParserQueueProcessor {
     try {
       const project = await this.project_service.retrieve(job.data.project_id)
 
+      await this.project_service.update(project._id, {
+        progress: ProjectProgress.FETCHING_INPUT,
+      })
+
       const video_url = await this.get_download_url(project.input_video_url)
 
       const video_buffer = await this.download_video(video_url)
@@ -101,6 +110,10 @@ export class InstagramParserQueueProcessor {
       this.analyze_video_queue.upload_video({ project_id: project._id })
     } catch (error) {
       console.log(error)
+
+      await this.project_service.update(job.data.project_id, {
+        status: ProjectStatus.FAILED,
+      })
     }
   }
 }

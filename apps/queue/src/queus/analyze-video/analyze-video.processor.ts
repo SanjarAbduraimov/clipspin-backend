@@ -2,10 +2,15 @@ import { OnQueueActive, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 import fs from 'fs'
 
+import {
+  ProjectProgress,
+  ProjectStatus,
+} from 'apps/backend/src/models/project.schema'
+
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
-import { GenAIService } from 'apps/backend/src/services/genai.service'
-
+import { GenAIService } from '../../services/genai.service'
+import { SlideGeneratorQueue } from '../slide-generator/slide-generator.queue'
 import {
   ANALYZE_VIDEO_QUEUE_EVENTS,
   ANALYZE_VIDEO_QUEUE_NAME,
@@ -20,6 +25,7 @@ export class AnalyzeVideoQueueProcessor {
     private readonly project_service: ProjectService,
     private readonly genai_service: GenAIService,
     private readonly analyze_video_queue: AnalyzeVideoQueue,
+    private readonly slide_generator_queue: SlideGeneratorQueue,
   ) {}
 
   @OnQueueActive()
@@ -35,6 +41,10 @@ export class AnalyzeVideoQueueProcessor {
     try {
       const project = await this.project_service.retrieve(job.data.project_id)
 
+      await this.project_service.update(project._id, {
+        progress: ProjectProgress.ANALYZING_INPUT,
+      })
+
       const file = await fs.promises.readFile(project.file_url)
 
       const file_context = await this.genai_service.upload_file(file)
@@ -45,6 +55,10 @@ export class AnalyzeVideoQueueProcessor {
       })
     } catch (error) {
       console.log(error)
+
+      await this.project_service.update(job.data.project_id, {
+        status: ProjectStatus.FAILED,
+      })
     }
   }
 
@@ -62,8 +76,16 @@ export class AnalyzeVideoQueueProcessor {
       await this.project_service.update(project.id, {
         input_summary: analysis.text,
       })
+
+      this.slide_generator_queue.generate_slides({
+        project_id: project.id,
+      })
     } catch (error) {
       console.log(error)
+
+      await this.project_service.update(job.data.project_id, {
+        status: ProjectStatus.FAILED,
+      })
     }
   }
 }

@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common'
 
 import { ProjectModule } from 'apps/backend/src/api/projects/project.module'
 
-import { GenAIService } from 'apps/backend/src/services/genai.service'
-
+import { GenAIService } from '../../services/genai.service'
+import { SlideGeneratorQueueModule } from '../slide-generator/slide-generator.module'
 import { AnalyzeVideoQueueProcessor } from './analyze-video.processor'
 import {
   ANALYZE_VIDEO_QUEUE_NAME,
@@ -17,6 +17,7 @@ import {
       name: ANALYZE_VIDEO_QUEUE_NAME,
     }),
     ProjectModule,
+    SlideGeneratorQueueModule,
   ],
   providers: [GenAIService, AnalyzeVideoQueue, AnalyzeVideoQueueProcessor],
   exports: [AnalyzeVideoQueue],
