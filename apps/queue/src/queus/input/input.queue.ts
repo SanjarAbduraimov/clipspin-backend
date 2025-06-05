@@ -7,6 +7,7 @@ export const INPUT_QUEUE_NAME = 'input-queue'
 
 export enum INPUT_QUEUE_EVENTS {
   PROCESS = 'process',
+  TEST = 'test',
 }
 
 export interface InputQueueData {
@@ -19,5 +20,9 @@ export class InputQueue {
 
   add(data: InputQueueData) {
     this.queue.add(INPUT_QUEUE_EVENTS.PROCESS, data)
+  }
+
+  test(data: InputQueueData) {
+    this.queue.add(INPUT_QUEUE_EVENTS.TEST, data)
   }
 }

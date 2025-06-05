@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { Queue } from 'bull'
 import { Types } from 'mongoose'
 
-export const INSTAGRAM_PARSER_QUEUE_NAME = 'input-queue'
+export const INSTAGRAM_PARSER_QUEUE_NAME = 'instagram-parser-queue'
 
 export enum INSTAGRAM_PARSER_QUEUE_EVENTS {
   DOWNLOAD_VIDEO = 'download_video',

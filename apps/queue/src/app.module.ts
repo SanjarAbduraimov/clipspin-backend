@@ -9,6 +9,8 @@ import { AnalyzeVideoQueueModule } from './queus/analyze-video/analyze-video.mod
 import { InputQueueModule } from './queus/input/input.module'
 import { InputQueueProcessor } from './queus/input/input.processor'
 import { InstagramParserQueueModule } from './queus/instagram-parser/instagram-parser.module'
+import { SlideGeneratorQueueModule } from './queus/slide-show-generator/slide-show-generator.module'
+import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-generator/text-audiogram-generator.module'
 
 @Module({
   imports: [
@@ -25,16 +27,17 @@ import { InstagramParserQueueModule } from './queus/instagram-parser/instagram-p
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        redis: {
-          host: configService.get('redis.host'),
-          port: parseInt(configService.get('redis.port'), 10),
-          username: configService.get('redis.username'),
-          password: configService.get('redis.password'),
-        },
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const url = configService.get('redis.url')
+
+        return {
+          url,
+        }
+      },
       inject: [ConfigService],
     }),
+    TextAudiogramGeneratorQueueModule,
+    SlideGeneratorQueueModule,
     AnalyzeVideoQueueModule,
     InstagramParserQueueModule,
     InputQueueModule,

@@ -14,6 +14,7 @@ async function bootstrap() {
       credentials: true,
       origin: true,
     },
+    logger: ['error', 'warn', 'log'],
   })
   const config_service = app.get<ConfigService>(ConfigService)
 

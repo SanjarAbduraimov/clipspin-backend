@@ -104,4 +104,23 @@ export class ProjectController {
 
     return { data: null }
   }
+
+  @Put('/:id/test')
+  @ResponseDTO(ProjectResponseDTO)
+  async test(@GetContext() ctx: Context, @Param('id') id: string) {
+    const project = await this.project_service.find(
+      { _id: id, user: ctx.user._id },
+      ctx,
+    )
+
+    if (!project) {
+      throw new NotFoundError(ProjectController.resource_name, {
+        id: id,
+      })
+    }
+
+    this.input_queue.test({ project_id: project._id })
+
+    return { data: project }
+  }
 }
