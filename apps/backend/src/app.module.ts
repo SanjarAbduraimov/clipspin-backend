@@ -38,10 +38,14 @@ import configuration from './config'
       useFactory: async (configService: ConfigService) => {
         const url = configService.get('redis.url')
 
-        console.log(url)
+        const parsed = new URL(url)
 
         return {
           url,
+          redis: {
+            password: parsed.password,
+            username: parsed.username,
+          },
         }
       },
       inject: [ConfigService],
