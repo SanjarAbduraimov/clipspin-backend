@@ -27,14 +27,23 @@ import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-genera
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        redis: {
-          host: configService.get('redis.host'),
-          port: parseInt(configService.get('redis.port'), 10),
-          username: configService.get('redis.username'),
-          password: configService.get('redis.password'),
-        },
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const host = configService.get('redis.host')
+        const port = parseInt(configService.get('redis.port'), 10)
+        const username = configService.get('redis.username')
+        const password = configService.get('redis.password')
+
+        console.log(host, port, username, password)
+
+        return {
+          redis: {
+            host,
+            port,
+            username,
+            password,
+          },
+        }
+      },
       inject: [ConfigService],
     }),
     TextAudiogramGeneratorQueueModule,
