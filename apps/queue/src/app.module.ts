@@ -30,15 +30,8 @@ import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-genera
       useFactory: async (configService: ConfigService) => {
         const url = configService.get('redis.url')
 
-        const parsed = new URL(url)
-
         return {
-          redis: {
-            password: parsed.password,
-            username: parsed.username,
-            host: parsed.host,
-            port: parsed.port ? parseInt(parsed.port, 10) : undefined,
-          },
+          url,
         }
       },
       inject: [ConfigService],
