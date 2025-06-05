@@ -1,11 +1,26 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Post,
+  Query,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { AuthGuard } from '@nestjs/passport'
 import { ApiTags } from '@nestjs/swagger'
+import { Response } from 'express'
 
 import { Public } from '../../common/decarators/public.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
 import { ErrorMessage } from '../../constants/errors'
 import { EmailService } from '../../services/email.service'
 import { AuthService } from './auth.service'
+import { GoogleAuthDTO, GoogleAuthResponseDTO } from './dto/google-auth.dto'
 import { OTPResponseDTO, SendOTPPhoneEmailDTO } from './dto/otp.dto'
 import { SignInDTO, SignInResponseDTO } from './dto/singin.dto'
 
@@ -15,6 +30,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Public()
@@ -58,5 +74,50 @@ export class AuthController {
     await this.authService.deleteOTP(otp._id)
 
     return { data: { access_token } }
+  }
+
+  @Public()
+  @Post('/google')
+  @ResponseDTO(GoogleAuthResponseDTO)
+  async googleAuth(
+    @Query('redirect_url') redirectUrl: string,
+    @Body() { idToken }: GoogleAuthDTO,
+  ) {
+    try {
+      const redirect_url = redirectUrl || null
+      console.log('redirect_url in /google', redirect_url)
+      const google_user = await this.authService.verifyGoogleToken(idToken)
+      const result = await this.authService.googleSignIn(
+        google_user,
+        redirect_url,
+      )
+
+      return { data: result }
+    } catch (error) {
+      throw new UnauthorizedException('Invalid Google token')
+    }
+  }
+
+  @Public()
+  @Get('/google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(
+    @Query('redirect_url') redirectUrl: string,
+    @Req() req,
+    @Res() res: Response,
+  ) {
+    const { user } = req
+    console.log(
+      'redirect_url in /google/callback',
+      JSON.stringify(req.query),
+      redirectUrl,
+    )
+    const result = await this.authService.googleSignIn(user)
+
+    const frontend_url = this.configService.get<string>('FRONTEND_URL')
+
+    return res.redirect(
+      `${frontend_url}/auth/google/callback?token=${result.access_token}`,
+    )
   }
 }

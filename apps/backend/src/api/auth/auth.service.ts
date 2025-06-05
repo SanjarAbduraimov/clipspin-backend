@@ -1,21 +1,32 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { InjectModel } from '@nestjs/mongoose'
 import * as bcrypt from 'bcryptjs'
+import { OAuth2Client } from 'google-auth-library'
 import { Model, Types } from 'mongoose'
 import * as crypto from 'node:crypto'
 
 import { EntityStatus } from '../../common/enums/status.enum'
 import { OTP } from '../../models/otp.schema'
 import { User } from '../../models/user.schema'
+import { GoogleUserDTO } from './dto/google-auth.dto'
 
 @Injectable()
 export class AuthService {
+  private googleClient: OAuth2Client
+
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(OTP.name) readonly otpModel: Model<OTP>,
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.googleClient = new OAuth2Client(
+      this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+    )
+  }
 
   generateOTP() {
     const code = Math.floor(100000 + Math.random() * 900000)
@@ -79,5 +90,50 @@ export class AuthService {
     const hash = await bcrypt.hash(password, 12)
 
     return hash
+  }
+
+  async verifyGoogleToken(token: string): Promise<GoogleUserDTO> {
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: token,
+        audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      })
+
+      const payload = ticket.getPayload()
+
+      return {
+        email: payload.email,
+        firstName: payload.given_name,
+        lastName: payload.family_name,
+        picture: payload.picture,
+      }
+    } catch (error) {
+      throw new Error('Invalid Google token')
+    }
+  }
+
+  async googleSignIn(googleUser: GoogleUserDTO, redirect_url?: string) {
+    const {
+      email,
+      firstName: first_name,
+      lastName: last_name,
+      picture,
+    } = googleUser
+
+    const user = await this.userModel.findOneAndUpdate(
+      { email, status: EntityStatus.ACTIVE },
+      {
+        email,
+        first_name,
+        last_name,
+        picture,
+        auth_method: 'google',
+      },
+      { upsert: true, new: true },
+    )
+
+    const access_token = await this.jwtService.signAsync({ user: user._id })
+
+    return { access_token, user, redirect_url }
   }
 }
