@@ -81,7 +81,10 @@ export class InstagramParserQueueProcessor {
 
   async save_video(buffer: Buffer): Promise<string> {
     const id = uuidv4()
-    const path = `./videos/${id}.mp4`
+    const folder = './videos'
+    const path = `${folder}/${id}.mp4`
+
+    await fs.promises.mkdir(folder, { recursive: true })
 
     await fs.promises.writeFile(path, buffer)
 
