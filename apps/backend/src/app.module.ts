@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
@@ -31,6 +32,19 @@ import configuration from './config'
       }),
       inject: [ConfigService],
       global: true,
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const url = configService.get('redis.url')
+
+        console.log(url)
+
+        return {
+          url,
+        }
+      },
+      inject: [ConfigService],
     }),
     AuthModule,
     ProfileModule,
