@@ -19,6 +19,9 @@ export class ProjectResponseDTO {
   input_video_url: string
 
   @Expose()
+  input_summary: string
+
+  @Expose()
   status: string
 
   @Expose()
