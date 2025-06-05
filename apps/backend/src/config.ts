@@ -11,8 +11,7 @@ export const validation_schema = Joi.object({
   DATABASE_PASSWORD: Joi.string().required(),
   JWT_SECRET: Joi.string().required(),
   DOCS_PASSWORD: Joi.string().required(),
-  REDIS_HOST: Joi.string().required(),
-  REDIS_PORT: Joi.number().default(6379),
+  REDIS_URL: Joi.string().required(),
   APIFY_TOKEN: Joi.string().required(),
   OPEN_AI_API_KEY: Joi.string().required(),
   FAL_AI_API_KEY: Joi.string().required(),
@@ -33,10 +32,7 @@ export const configuration = () => ({
   jwt_secret: process.env.JWT_SECRET,
   docs_password: process.env.DOCS_PASSWORD,
   redis: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    username: process.env.REDIS_USERNAME,
-    password: process.env.REDIS_PASSWORD,
+    url: process.env.REDIS_URL,
   },
   apify: {
     token: process.env.APIFY_TOKEN,

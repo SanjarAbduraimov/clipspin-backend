@@ -28,20 +28,12 @@ import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-genera
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const host = configService.get('redis.host')
-        const port = parseInt(configService.get('redis.port'), 10)
-        const username = configService.get('redis.username')
-        const password = configService.get('redis.password')
+        const url = configService.get('redis.url')
 
-        console.log(host, port, username, password)
+        console.log(url)
 
         return {
-          redis: {
-            host,
-            port,
-            username,
-            password,
-          },
+          url,
         }
       },
       inject: [ConfigService],
