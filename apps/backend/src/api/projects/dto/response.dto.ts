@@ -22,6 +22,9 @@ export class ProjectResponseDTO {
   status: string
 
   @Expose()
+  progress: string
+
+  @Expose()
   @Type(() => ProjectResultDTO)
   result: ProjectResultDTO
 }
