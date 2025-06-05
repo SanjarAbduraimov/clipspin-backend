@@ -9,7 +9,8 @@ import { AnalyzeVideoQueueModule } from './queus/analyze-video/analyze-video.mod
 import { InputQueueModule } from './queus/input/input.module'
 import { InputQueueProcessor } from './queus/input/input.processor'
 import { InstagramParserQueueModule } from './queus/instagram-parser/instagram-parser.module'
-import { SlideGeneratorQueueModule } from './queus/slide-generator/slide-generator.module'
+import { SlideGeneratorQueueModule } from './queus/slide-show-generator/slide-show-generator.module'
+import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-generator/text-audiogram-generator.module'
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SlideGeneratorQueueModule } from './queus/slide-generator/slide-generat
       }),
       inject: [ConfigService],
     }),
+    TextAudiogramGeneratorQueueModule,
     SlideGeneratorQueueModule,
     AnalyzeVideoQueueModule,
     InstagramParserQueueModule,

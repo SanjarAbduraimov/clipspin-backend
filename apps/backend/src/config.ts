@@ -17,7 +17,8 @@ export const validation_schema = Joi.object({
   OPEN_AI_API_KEY: Joi.string().required(),
   FAL_AI_API_KEY: Joi.string().required(),
   CREATOMATE_API_KEY: Joi.string().required(),
-  CREATOMATE_TEMPLATE_ID: Joi.string().required(),
+  CREATOMATE_SLIDE_SHOW_TEMPLATE_ID: Joi.string().required(),
+  CREATOMATE_TEXT_AUDIOGRAM_TEMPLATE_ID: Joi.string().required(),
 })
 
 export const configuration = () => ({
@@ -51,7 +52,9 @@ export const configuration = () => ({
   },
   creatomate: {
     api_key: process.env.CREATOMATE_API_KEY,
-    template_id: process.env.CREATOMATE_TEMPLATE_ID,
+    slide_show_template_id: process.env.CREATOMATE_SLIDE_SHOW_TEMPLATE_ID,
+    text_audiogram_template_id:
+      process.env.CREATOMATE_TEXT_AUDIOGRAM_TEMPLATE_ID,
   },
 })
 

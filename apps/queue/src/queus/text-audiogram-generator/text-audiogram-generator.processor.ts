@@ -6,7 +6,6 @@ import { Job } from 'bull'
 import {
   ProjectProgress,
   ProjectStatus,
-  Scene,
 } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
@@ -15,14 +14,14 @@ import { CreatomateService } from '../../services/creatomate.service'
 import { FalAIService } from '../../services/falai.service'
 import { OpenAIService } from '../../services/openai.service'
 import {
-  GenerateSlidesData,
-  SLIDE_GENERATOR_QUEUE_EVENTS,
-  SLIDE_GENERATOR_QUEUE_NAME,
-  SlideGeneratorQueue,
-} from './slide-generator.queue'
+  GenerateTextAudiogramData,
+  TEXT_AUDIOGRAM_GENERATOR_QUEUE_EVENTS,
+  TEXT_AUDIOGRAM_GENERATOR_QUEUE_NAME,
+  TextAudiogramGeneratorQueue,
+} from './text-audiogram-generator.queue'
 
-@Processor(SLIDE_GENERATOR_QUEUE_NAME)
-export class SlideGeneratorQueueProcessor {
+@Processor(TEXT_AUDIOGRAM_GENERATOR_QUEUE_NAME)
+export class TextAudiogramGeneratorQueueProcessor {
   client: ApifyClient
 
   constructor(
@@ -31,7 +30,7 @@ export class SlideGeneratorQueueProcessor {
     private readonly openai_service: OpenAIService,
     private readonly falai_service: FalAIService,
     private readonly creatomate_service: CreatomateService,
-    private readonly slide_generator_queue: SlideGeneratorQueue,
+    private readonly text_audiogram_generator_queue: TextAudiogramGeneratorQueue,
   ) {
     const token = this.config_service.get('apify.token')
 
@@ -48,26 +47,24 @@ export class SlideGeneratorQueueProcessor {
     )
   }
 
-  @Process(SLIDE_GENERATOR_QUEUE_EVENTS.GENERATE_SCENES)
-  async generate_scenes(job: Job<GenerateSlidesData>) {
+  @Process(TEXT_AUDIOGRAM_GENERATOR_QUEUE_EVENTS.GENERATE_SCRIPT)
+  async generate_scenes(job: Job<GenerateTextAudiogramData>) {
     try {
       const project = await this.project_service.retrieve(job.data.project_id)
 
       await this.project_service.update(project._id, {
-        progress: ProjectProgress.GENERATING_SCENES,
+        progress: ProjectProgress.GENERATING_SCRIPT,
       })
 
-      const scenes = await this.openai_service.generate_scenes({
+      const script = await this.openai_service.generate_script({
         description: project.input_summary,
       })
 
       await this.project_service.update(project.id, {
-        scenes: scenes.scenes.filter(
-          (item) => item.image_prompt && item.voiceover_script,
-        ),
+        script,
       })
 
-      this.slide_generator_queue.generate_scene_images({
+      this.text_audiogram_generator_queue.generate_scene_image({
         project_id: project._id,
       })
     } catch (error) {
@@ -75,33 +72,27 @@ export class SlideGeneratorQueueProcessor {
     }
   }
 
-  @Process(SLIDE_GENERATOR_QUEUE_EVENTS.GENERATE_SCENE_IMAGE)
-  async generate_slides(job: Job<GenerateSlidesData>) {
+  @Process(TEXT_AUDIOGRAM_GENERATOR_QUEUE_EVENTS.GENERATE_IMAGE)
+  async generate_image(job: Job<GenerateTextAudiogramData>) {
     try {
       const project = await this.project_service.retrieve(job.data.project_id)
 
       await this.project_service.update(project._id, {
-        progress: ProjectProgress.GENERATING_SCENE_IMAGES,
+        progress: ProjectProgress.GENERATING_IMAGES,
       })
 
-      const scenes: Scene[] = []
-
-      for (const scene of project.scenes) {
-        const image = await this.falai_service.generate_image({
-          prompt: scene.image_prompt,
-        })
-
-        scenes.push({
-          ...scene,
-          image_url: image.url,
-        })
-      }
+      const image = await this.falai_service.generate_image({
+        prompt: project.script.image_prompt,
+      })
 
       await this.project_service.update(project.id, {
-        scenes,
+        script: {
+          ...project.script,
+          image_url: image.url,
+        },
       })
 
-      this.slide_generator_queue.generate_video({
+      this.text_audiogram_generator_queue.generate_video({
         project_id: project._id,
       })
     } catch (error) {
@@ -113,8 +104,8 @@ export class SlideGeneratorQueueProcessor {
     }
   }
 
-  @Process(SLIDE_GENERATOR_QUEUE_EVENTS.GENERATE_VIDEO)
-  async generate_video(job: Job<GenerateSlidesData>) {
+  @Process(TEXT_AUDIOGRAM_GENERATOR_QUEUE_EVENTS.GENERATE_VIDEO)
+  async generate_video(job: Job<GenerateTextAudiogramData>) {
     try {
       const project = await this.project_service.retrieve(job.data.project_id)
 
@@ -122,8 +113,8 @@ export class SlideGeneratorQueueProcessor {
         progress: ProjectProgress.GENERATING_VIDEO,
       })
 
-      const video_url = await this.creatomate_service.generate_video({
-        scenes: project.scenes,
+      const video_url = await this.creatomate_service.generate_text_audiogram({
+        script: project.script,
       })
 
       await this.project_service.update(job.data.project_id, {

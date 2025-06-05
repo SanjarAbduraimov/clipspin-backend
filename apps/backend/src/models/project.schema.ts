@@ -5,6 +5,11 @@ import { COLLECTION_TIMESTAMPS } from '../constants'
 
 export type ProjectDocument = HydratedDocument<Project>
 
+export enum ProjectType {
+  SLIDE_SHOW = 'slide_show',
+  TEXT_AUDIOGRAM = 'text_audiogram',
+}
+
 export enum ProjectStatus {
   PENDING = 'pending',
   CANCELLED = 'cancelled',
@@ -15,8 +20,8 @@ export enum ProjectStatus {
 export enum ProjectProgress {
   FETCHING_INPUT = 'fetching_input',
   ANALYZING_INPUT = 'analyzing_input',
-  GENERATING_SCENES = 'generating_scenes',
-  GENERATING_SCENE_IMAGES = 'generating_scene_images',
+  GENERATING_SCRIPT = 'generating_script',
+  GENERATING_IMAGES = 'generating_images',
   GENERATING_VIDEO = 'generating_video',
 }
 
@@ -34,6 +39,20 @@ export class Scene {
   image_url?: string
 }
 
+export class Script {
+  @Prop()
+  quote_text?: string
+
+  @Prop()
+  quote_author?: string
+
+  @Prop()
+  image_prompt?: string
+
+  @Prop()
+  image_url?: string
+}
+
 export class ProjectResult {
   @Prop()
   video_url: string
@@ -44,6 +63,12 @@ export class ProjectResult {
   collection: 'projects',
 })
 export class Project {
+  @Prop({
+    type: String,
+    enum: ProjectType,
+  })
+  type: ProjectType
+
   @Prop()
   title: string
 
@@ -59,6 +84,9 @@ export class Project {
   @Prop({ type: [Scene] })
   scenes?: Scene[]
 
+  @Prop({ type: Script })
+  script?: Script
+
   @Prop({ type: Types.ObjectId, ref: 'users' })
   user: Types.ObjectId
 
@@ -67,7 +95,7 @@ export class Project {
     enum: ProjectStatus,
     default: ProjectStatus.PENDING,
   })
-  status?: ProjectStatus = ProjectStatus.PENDING
+  status: ProjectStatus = ProjectStatus.PENDING
 
   @Prop({
     type: String,

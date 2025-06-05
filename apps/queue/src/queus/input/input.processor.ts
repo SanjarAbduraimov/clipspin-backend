@@ -2,7 +2,7 @@ import { OnQueueActive, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 
 import { InstagramParserQueue } from '../instagram-parser/instagram-parser.queue'
-import { SlideGeneratorQueue } from '../slide-generator/slide-generator.queue'
+import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
 import {
   INPUT_QUEUE_EVENTS,
   INPUT_QUEUE_NAME,

@@ -19,7 +19,7 @@ export interface GenerateSlidesData {
 export class SlideGeneratorQueue {
   constructor(@InjectQueue(SLIDE_GENERATOR_QUEUE_NAME) private queue: Queue) {}
 
-  generate_slides(data: GenerateSlidesData) {
+  generate(data: GenerateSlidesData) {
     this.queue.add(SLIDE_GENERATOR_QUEUE_EVENTS.GENERATE_SCENES, data)
   }
 

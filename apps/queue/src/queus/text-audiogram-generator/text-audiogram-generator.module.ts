@@ -6,16 +6,16 @@ import { ProjectModule } from 'apps/backend/src/api/projects/project.module'
 import { CreatomateService } from '../../services/creatomate.service'
 import { FalAIService } from '../../services/falai.service'
 import { OpenAIService } from '../../services/openai.service'
-import { SlideGeneratorQueueProcessor } from './slide-generator.processor'
+import { TextAudiogramGeneratorQueueProcessor } from './text-audiogram-generator.processor'
 import {
-  SLIDE_GENERATOR_QUEUE_NAME,
-  SlideGeneratorQueue,
-} from './slide-generator.queue'
+  TEXT_AUDIOGRAM_GENERATOR_QUEUE_NAME,
+  TextAudiogramGeneratorQueue,
+} from './text-audiogram-generator.queue'
 
 @Module({
   imports: [
     BullModule.registerQueue({
-      name: SLIDE_GENERATOR_QUEUE_NAME,
+      name: TEXT_AUDIOGRAM_GENERATOR_QUEUE_NAME,
     }),
     ProjectModule,
   ],
@@ -23,9 +23,9 @@ import {
     OpenAIService,
     FalAIService,
     CreatomateService,
-    SlideGeneratorQueue,
-    SlideGeneratorQueueProcessor,
+    TextAudiogramGeneratorQueue,
+    TextAudiogramGeneratorQueueProcessor,
   ],
-  exports: [SlideGeneratorQueue],
+  exports: [TextAudiogramGeneratorQueue],
 })
-export class SlideGeneratorQueueModule {}
+export class TextAudiogramGeneratorQueueModule {}
