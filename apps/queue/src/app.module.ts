@@ -33,10 +33,11 @@ import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-genera
         const parsed = new URL(url)
 
         return {
-          url,
           redis: {
             password: parsed.password,
             username: parsed.username,
+            host: parsed.host,
+            port: parsed.port ? parseInt(parsed.port, 10) : undefined,
           },
         }
       },
