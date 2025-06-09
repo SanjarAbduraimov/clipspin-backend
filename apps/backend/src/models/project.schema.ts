@@ -88,7 +88,7 @@ export class Project {
   input_video_url: string
 
   @Prop()
-  file_url?: string
+  file_key?: string
 
   @Prop()
   input_summary?: string

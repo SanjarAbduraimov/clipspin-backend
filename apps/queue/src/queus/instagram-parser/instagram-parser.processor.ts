@@ -2,7 +2,6 @@ import { OnQueueActive, Process, Processor } from '@nestjs/bull'
 import { ConfigService } from '@nestjs/config'
 import { ApifyClient } from 'apify-client'
 import { Job } from 'bull'
-import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
@@ -11,6 +10,8 @@ import {
 } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
+
+import { R2Service } from 'apps/backend/src/services/r2.service'
 
 import { AnalyzeVideoQueue } from '../analyze-video/analyze-video.queue'
 import {
@@ -26,6 +27,7 @@ export class InstagramParserQueueProcessor {
   constructor(
     private readonly config_service: ConfigService,
     private readonly project_service: ProjectService,
+    private readonly r2_service: R2Service,
     private readonly analyze_video_queue: AnalyzeVideoQueue,
   ) {
     const token = this.config_service.get('apify.token')
@@ -81,14 +83,15 @@ export class InstagramParserQueueProcessor {
 
   async save_video(buffer: Buffer): Promise<string> {
     const id = uuidv4()
-    const folder = './videos'
-    const path = `${folder}/${id}.mp4`
+    const key = `${id}.mp4`
 
-    await fs.promises.mkdir(folder, { recursive: true })
+    await this.r2_service.upload_file({
+      key,
+      body: buffer,
+      content_type: 'video/mp4',
+    })
 
-    await fs.promises.writeFile(path, buffer)
-
-    return path
+    return key
   }
 
   @Process(INSTAGRAM_PARSER_QUEUE_EVENTS.DOWNLOAD_VIDEO)
@@ -107,7 +110,7 @@ export class InstagramParserQueueProcessor {
       const path = await this.save_video(video_buffer)
 
       await this.project_service.update(project._id, {
-        file_url: path,
+        file_key: path,
       })
 
       this.analyze_video_queue.upload_video({ project_id: project._id })

@@ -1,6 +1,5 @@
 import { OnQueueActive, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
-import fs from 'fs'
 
 import {
   ProjectProgress,
@@ -9,6 +8,8 @@ import {
 } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
+
+import { R2Service } from 'apps/backend/src/services/r2.service'
 
 import { GenAIService } from '../../services/genai.service'
 import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
@@ -27,6 +28,7 @@ export class AnalyzeVideoQueueProcessor {
   constructor(
     private readonly project_service: ProjectService,
     private readonly genai_service: GenAIService,
+    private readonly r2_service: R2Service,
     private readonly analyze_video_queue: AnalyzeVideoQueue,
     private readonly slide_generator_queue: SlideGeneratorQueue,
     private readonly text_audiogram_generator_queue: TextAudiogramGeneratorQueue,
@@ -50,7 +52,7 @@ export class AnalyzeVideoQueueProcessor {
         progress: ProjectProgress.ANALYZING_INPUT,
       })
 
-      const file = await fs.promises.readFile(project.file_url)
+      const file = await this.r2_service.get_file(project.file_key)
 
       const file_context = await this.genai_service.upload_file(file)
 

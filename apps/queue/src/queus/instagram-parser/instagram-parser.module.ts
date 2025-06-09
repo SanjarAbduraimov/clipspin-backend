@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common'
 
 import { ProjectModule } from 'apps/backend/src/api/projects/project.module'
 
+import { R2Service } from 'apps/backend/src/services/r2.service'
+
 import { AnalyzeVideoQueueModule } from '../analyze-video/analyze-video.module'
 import { InstagramParserQueueProcessor } from './instagram-parser.processor'
 import {
@@ -18,7 +20,7 @@ import {
     ProjectModule,
     AnalyzeVideoQueueModule,
   ],
-  providers: [InstagramParserQueue, InstagramParserQueueProcessor],
+  providers: [InstagramParserQueue, InstagramParserQueueProcessor, R2Service],
   exports: [InstagramParserQueue],
 })
 export class InstagramParserQueueModule {}
