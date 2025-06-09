@@ -8,6 +8,7 @@ export type ProjectDocument = HydratedDocument<Project>
 export enum ProjectType {
   SLIDE_SHOW = 'slide_show',
   TEXT_AUDIOGRAM = 'text_audiogram',
+  TALKING_HEAD = 'talking_head',
 }
 
 export enum ProjectStatus {
@@ -53,9 +54,20 @@ export class Script {
   image_url?: string
 }
 
+export class TalkingHeadScript {
+  @Prop()
+  title?: string
+
+  @Prop()
+  script?: string
+}
+
 export class ProjectResult {
   @Prop()
-  video_url: string
+  video_url?: string
+
+  @Prop()
+  video_id?: string
 }
 
 @Schema({
@@ -86,6 +98,9 @@ export class Project {
 
   @Prop({ type: Script })
   script?: Script
+
+  @Prop({ type: TalkingHeadScript })
+  talking_head_script?: TalkingHeadScript
 
   @Prop({ type: Types.ObjectId, ref: 'users' })
   user: Types.ObjectId

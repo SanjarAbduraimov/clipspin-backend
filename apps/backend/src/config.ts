@@ -21,6 +21,8 @@ export const validation_schema = Joi.object({
   GOOGLE_CLIENT_ID: Joi.string().required(),
   GOOGLE_CLIENT_SECRET: Joi.string().required(),
   GOOGLE_OAUTH_CALLBACK_URL: Joi.string().required(),
+  HEYGEN_API_KEY: Joi.string().required(),
+  HEYGEN_CALLBACK_URL: Joi.string().required(),
 })
 
 export const configuration = () => ({
@@ -58,6 +60,10 @@ export const configuration = () => ({
     slide_show_template_id: process.env.CREATOMATE_SLIDE_SHOW_TEMPLATE_ID,
     text_audiogram_template_id:
       process.env.CREATOMATE_TEXT_AUDIOGRAM_TEMPLATE_ID,
+  },
+  heygen: {
+    api_key: process.env.HEYGEN_API_KEY,
+    callback_url: process.env.HEYGEN_CALLBACK_URL,
   },
 })
 

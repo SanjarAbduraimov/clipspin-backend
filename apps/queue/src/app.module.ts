@@ -10,6 +10,7 @@ import { InputQueueModule } from './queus/input/input.module'
 import { InputQueueProcessor } from './queus/input/input.processor'
 import { InstagramParserQueueModule } from './queus/instagram-parser/instagram-parser.module'
 import { SlideGeneratorQueueModule } from './queus/slide-show-generator/slide-show-generator.module'
+import { TalkingHeadGeneratorQueueModule } from './queus/talking-head-generator/talking-head-generator.module'
 import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-generator/text-audiogram-generator.module'
 
 @Module({
@@ -36,6 +37,7 @@ import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-genera
       },
       inject: [ConfigService],
     }),
+    TalkingHeadGeneratorQueueModule,
     TextAudiogramGeneratorQueueModule,
     SlideGeneratorQueueModule,
     AnalyzeVideoQueueModule,

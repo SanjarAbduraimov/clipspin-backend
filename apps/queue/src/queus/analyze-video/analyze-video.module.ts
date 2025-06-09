@@ -5,6 +5,7 @@ import { ProjectModule } from 'apps/backend/src/api/projects/project.module'
 
 import { GenAIService } from '../../services/genai.service'
 import { SlideGeneratorQueueModule } from '../slide-show-generator/slide-show-generator.module'
+import { TalkingHeadGeneratorQueueModule } from '../talking-head-generator/talking-head-generator.module'
 import { TextAudiogramGeneratorQueueModule } from '../text-audiogram-generator/text-audiogram-generator.module'
 import { AnalyzeVideoQueueProcessor } from './analyze-video.processor'
 import {
@@ -20,6 +21,7 @@ import {
     ProjectModule,
     SlideGeneratorQueueModule,
     TextAudiogramGeneratorQueueModule,
+    TalkingHeadGeneratorQueueModule,
   ],
   providers: [GenAIService, AnalyzeVideoQueue, AnalyzeVideoQueueProcessor],
   exports: [AnalyzeVideoQueue],

@@ -12,6 +12,7 @@ import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
 import { GenAIService } from '../../services/genai.service'
 import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
+import { TalkingHeadGeneratorQueue } from '../talking-head-generator/talking-head-generator.queue'
 import { TextAudiogramGeneratorQueue } from '../text-audiogram-generator/text-audiogram-generator.queue'
 import {
   ANALYZE_VIDEO_QUEUE_EVENTS,
@@ -29,6 +30,7 @@ export class AnalyzeVideoQueueProcessor {
     private readonly analyze_video_queue: AnalyzeVideoQueue,
     private readonly slide_generator_queue: SlideGeneratorQueue,
     private readonly text_audiogram_generator_queue: TextAudiogramGeneratorQueue,
+    private readonly talkin_head_generator_queue: TalkingHeadGeneratorQueue,
   ) {}
 
   @OnQueueActive()
@@ -89,6 +91,12 @@ export class AnalyzeVideoQueueProcessor {
 
         case ProjectType.TEXT_AUDIOGRAM:
           this.text_audiogram_generator_queue.generate({
+            project_id: project.id,
+          })
+          break
+
+        case ProjectType.TALKING_HEAD:
+          this.talkin_head_generator_queue.generate({
             project_id: project.id,
           })
           break

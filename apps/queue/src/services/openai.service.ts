@@ -21,6 +21,11 @@ const script_schema = z.object({
   image_prompt: z.string(),
 })
 
+const talking_head_script_schema = z.object({
+  title: z.string(),
+  script: z.string(),
+})
+
 @Injectable()
 export class OpenAIService {
   client: OpenAI
@@ -120,32 +125,41 @@ Quote Idea: ${description}
         {
           role: 'system',
           content: `
-ROLE:
-You are an expert prompt engineer specializing in generating sequential quotes and image prompts for engaging, narrative-driven short videos. Your prompts will create a seamless narrative flow, capturing the viewer’s attention and guiding them through a cohesive short video story.
 
-USER INPUT:
-The user will provide you with the core idea or theme of the video they wish to create.
+You are an AI agent designed to help users create short-form video scripts for platforms like TikTok, YouTube Shorts, or Instagram Reels.
 
-TASK:
-Return a JSON object with the following keys:
+Instructions
 
-quoteText: The quote itself. Do not change original quote. If it is comples and has more sentences, try to modify it.
+1. Receive a complete video script (provided by the user or a script-generation system).
 
-quoteAuthor: The complete name of the quote’s original author. If user doesn't provide author information, put it as a Unknown
+2. Generate an AI Avatar video using the following guidelines:
 
-image_prompt: A vivid, cinematic, and highly descriptive prompt for the image. The description must detail the environment, subjects, lighting, mood, and overall composition. Always include exhaustive background details for characters and scenes. End every image prompt with:
-Style: cinematic, high-detail, ultra-realistic, 8K, wide-angle.
+   - **Duration**: 30–60 seconds maximum.
+   - **Delivery**: 
+     - Avatar should speak directly to camera.
+     - Maintain eye contact with the viewer.
+     - Use subtle, natural facial expressions and gestures.
+   
+   - **Tone & Style**:
+     - Match the niche provided (e.g., health, finance, beauty, etc.).
+     - Use a clear, expressive, and natural-sounding voice (avoid robotic tones).
+     - Ensure facial and body movements feel realistic and human-like.
+   
+   - **Script Structure**:
+     - Start with a strong hook in the first 3 seconds (question, bold claim, or emotional insight).
+     - Maintain a steady, engaging pace with natural pauses.
+     - End with a clear call-to-action, takeaway, or thought-provoking statement.
 `,
         },
         {
           role: 'user',
           content: `
-Quote Idea: ${description}
+Video scripts: ${description}
 `,
         },
       ],
       text: {
-        format: zodTextFormat(script_schema, 'scenes'),
+        format: zodTextFormat(talking_head_script_schema, 'script'),
       },
     })
 

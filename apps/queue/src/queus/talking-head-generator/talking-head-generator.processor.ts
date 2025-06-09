@@ -59,7 +59,7 @@ export class TalkingHeadGeneratorQueueProcessor {
       })
 
       await this.project_service.update(project.id, {
-        script,
+        talking_head_script: script,
       })
 
       this.talking_head_generator_queue.generate_video({
@@ -79,15 +79,15 @@ export class TalkingHeadGeneratorQueueProcessor {
         progress: ProjectProgress.GENERATING_VIDEO,
       })
 
-      const video_url = await this.heygen_service.generate_video({
-        script: project.script,
-        title: project.title,
+      const video = await this.heygen_service.generate_video({
+        script: project.talking_head_script.script,
+        title: project.talking_head_script.title,
+        callback_id: project._id.toString(),
       })
 
       await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.COMPLETED,
         result: {
-          video_url,
+          video_id: video.data.video_id,
         },
       })
     } catch (error) {

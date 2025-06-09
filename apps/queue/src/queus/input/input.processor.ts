@@ -2,7 +2,7 @@ import { OnQueueActive, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 
 import { InstagramParserQueue } from '../instagram-parser/instagram-parser.queue'
-import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
+import { TalkingHeadGeneratorQueue } from '../talking-head-generator/talking-head-generator.queue'
 import {
   INPUT_QUEUE_EVENTS,
   INPUT_QUEUE_NAME,
@@ -13,7 +13,7 @@ import {
 export class InputQueueProcessor {
   constructor(
     private readonly instagram_parser_queue: InstagramParserQueue,
-    private readonly test_queue: SlideGeneratorQueue,
+    private readonly test_queue: TalkingHeadGeneratorQueue,
   ) {}
 
   @OnQueueActive()

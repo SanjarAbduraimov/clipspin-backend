@@ -4,8 +4,10 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { InputQueue } from 'apps/queue/src/queus/input/input.queue'
 
 import { Context, GetContext } from '../../common/decarators/context.decarator'
+import { Public } from '../../common/decarators/public.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
 import { NotFoundError } from '../../common/errors/not-fount.error'
+import { ProjectStatus } from '../../models/project.schema'
 import { CreateProjectDTO } from './dto/create.dto'
 import { ProjectResponseDTO } from './dto/response.dto'
 import { UpdateProjectDTO } from './dto/update.dto'
@@ -122,5 +124,29 @@ export class ProjectController {
     this.input_queue.test({ project_id: project._id })
 
     return { data: project }
+  }
+
+  @Public()
+  @Post('/heygen/callback')
+  @ResponseDTO(ProjectResponseDTO)
+  async heygen_callback(@Body() body: any) {
+    if (body.event_type == 'avatar_video.success') {
+      const project = await this.project_service.retrieve(
+        body.event_data.callback_id,
+      )
+
+      if (project) {
+        const result = project.result || {}
+
+        result.video_url = body.event_data.url
+
+        await this.project_service.update(project._id, {
+          status: ProjectStatus.COMPLETED,
+          result,
+        })
+      }
+    }
+
+    return {}
   }
 }
