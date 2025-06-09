@@ -18,6 +18,9 @@ export const validation_schema = Joi.object({
   CREATOMATE_API_KEY: Joi.string().required(),
   CREATOMATE_SLIDE_SHOW_TEMPLATE_ID: Joi.string().required(),
   CREATOMATE_TEXT_AUDIOGRAM_TEMPLATE_ID: Joi.string().required(),
+  GOOGLE_CLIENT_ID: Joi.string().required(),
+  GOOGLE_CLIENT_SECRET: Joi.string().required(),
+  GOOGLE_OAUTH_CALLBACK_URL: Joi.string().required(),
 })
 
 export const configuration = () => ({
@@ -39,6 +42,10 @@ export const configuration = () => ({
   },
   google: {
     genai_api_key: process.env.GOOGLE_GEN_AI_API_KEY,
+
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    callback_url: process.env.GOOGLE_OAUTH_CALLBACK_URL,
   },
   openai: {
     api_key: process.env.OPEN_AI_API_KEY,
