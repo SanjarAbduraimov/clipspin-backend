@@ -10,10 +10,7 @@ import metadata from './metadata'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: {
-      credentials: true,
-      origin: true,
-    },
+    cors: true,
     logger: ['error', 'warn', 'log'],
   })
   const config_service = app.get<ConfigService>(ConfigService)
@@ -40,7 +37,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformResponseInterceptor())
 
   const swagger_config = new DocumentBuilder()
-    .setTitle('UzChesse API')
+    .setTitle('Clipspin API')
     .setVersion('1.0')
     .addBearerAuth()
     .build()
