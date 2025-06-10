@@ -8,4 +8,8 @@ export class UpdateProjectDTO {
   @IsString()
   @IsOptional()
   input_video_url?: string
+
+  @IsString()
+  @IsOptional()
+  input_summary: string
 }
