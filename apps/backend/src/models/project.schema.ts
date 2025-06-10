@@ -9,6 +9,7 @@ export enum ProjectType {
   SLIDE_SHOW = 'slide_show',
   TEXT_AUDIOGRAM = 'text_audiogram',
   TALKING_HEAD = 'talking_head',
+  PROFESSIONAL = 'professional',
 }
 
 export enum ProjectStatus {
@@ -21,6 +22,7 @@ export enum ProjectStatus {
 export enum ProjectProgress {
   FETCHING_INPUT = 'fetching_input',
   ANALYZING_INPUT = 'analyzing_input',
+  SUMMARY_GENERATED = 'summary_generated',
   GENERATING_SCRIPT = 'generating_script',
   GENERATING_IMAGES = 'generating_images',
   GENERATING_VIDEO = 'generating_video',

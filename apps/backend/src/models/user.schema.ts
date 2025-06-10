@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import bcrypt from 'bcrypt'
 import { HydratedDocument } from 'mongoose'
 
+import { UserRole } from '../common/enums/role.enum'
 import { EntityStatus } from '../common/enums/status.enum'
 import { COLLECTION_TIMESTAMPS } from '../constants'
 
@@ -20,6 +21,14 @@ export class User {
 
   @Prop({ type: String, select: false })
   password: string
+
+  @Prop({
+    type: String,
+    required: true,
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole
 
   @Prop({
     type: String,

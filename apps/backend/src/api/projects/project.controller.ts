@@ -6,10 +6,13 @@ import { InputQueue } from 'apps/queue/src/queus/input/input.queue'
 import { Context, GetContext } from '../../common/decarators/context.decarator'
 import { Public } from '../../common/decarators/public.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
+import { AllowedRoles } from '../../common/decarators/role.decarator'
+import { UserRole } from '../../common/enums/role.enum'
 import { NotFoundError } from '../../common/errors/not-fount.error'
-import { ProjectStatus } from '../../models/project.schema'
+import { ProjectStatus, ProjectType } from '../../models/project.schema'
 import { CreateProjectDTO } from './dto/create.dto'
 import { ProjectResponseDTO } from './dto/response.dto'
+import { ProjectResultDTO } from './dto/result.dto'
 import { UpdateProjectDTO } from './dto/update.dto'
 import { ProjectService } from './project.service'
 
@@ -29,6 +32,20 @@ export class ProjectController {
     const projects = await this.project_service.list(
       {
         user: ctx.user._id,
+      },
+      ctx,
+    )
+
+    return { data: projects }
+  }
+
+  @Get('/professional')
+  @AllowedRoles(UserRole.EDITOR)
+  @ResponseDTO(ProjectResponseDTO)
+  async getEditorProjects(@GetContext() ctx: Context) {
+    const projects = await this.project_service.list(
+      {
+        type: ProjectType.PROFESSIONAL,
       },
       ctx,
     )
@@ -61,7 +78,51 @@ export class ProjectController {
       user: ctx.user?._id,
     })
 
-    this.input_queue.add({ project_id: project._id })
+    this.input_queue.analyze({ project_id: project._id })
+
+    return { data: project }
+  }
+
+  @Post('/:id/generate')
+  @ResponseDTO(ProjectResponseDTO)
+  async generate(@GetContext() ctx: Context, @Param('id') id: string) {
+    const project = await this.project_service.find(
+      { _id: id, user: ctx.user._id },
+      ctx,
+    )
+
+    if (!project) {
+      throw new NotFoundError(ProjectController.resource_name, {
+        id: id,
+      })
+    }
+
+    this.input_queue.generate({ project_id: project._id })
+
+    return { data: project }
+  }
+
+  @Post('/:id/result')
+  @AllowedRoles(UserRole.EDITOR)
+  @ResponseDTO(ProjectResponseDTO)
+  async submit_result(
+    @GetContext() ctx: Context,
+    @Param('id') id: string,
+    @Body() body: ProjectResultDTO,
+  ) {
+    let project = await this.project_service.find({ _id: id }, ctx)
+
+    if (!project) {
+      throw new NotFoundError(ProjectController.resource_name, {
+        id: id,
+      })
+    }
+
+    project = await this.project_service.update(
+      id,
+      { result: body, status: ProjectStatus.COMPLETED },
+      ctx,
+    )
 
     return { data: project }
   }
@@ -105,25 +166,6 @@ export class ProjectController {
     await this.project_service.delete(id)
 
     return { data: null }
-  }
-
-  @Put('/:id/test')
-  @ResponseDTO(ProjectResponseDTO)
-  async test(@GetContext() ctx: Context, @Param('id') id: string) {
-    const project = await this.project_service.find(
-      { _id: id, user: ctx.user._id },
-      ctx,
-    )
-
-    if (!project) {
-      throw new NotFoundError(ProjectController.resource_name, {
-        id: id,
-      })
-    }
-
-    this.input_queue.test({ project_id: project._id })
-
-    return { data: project }
   }
 
   @Public()

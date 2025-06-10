@@ -10,6 +10,8 @@ import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
 
 import { IS_PUBLIC_KEY } from '../../common/decarators/public.decarator'
+import { ALLOWED_ROLES_KEY } from '../../common/decarators/role.decarator'
+import { UserRole } from '../../common/enums/role.enum'
 import { ErrorMessage } from '../../constants/errors'
 import { AuthService } from './auth.service'
 
@@ -27,6 +29,10 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ])
+    const allowed_roles = this.reflector.getAllAndOverride<UserRole[]>(
+      ALLOWED_ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    ) || [UserRole.USER]
 
     if (is_public) {
       return true
@@ -49,6 +55,10 @@ export class AuthGuard implements CanActivate {
       const user = await this.authService.getUser(payload.user)
 
       if (!user) {
+        throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED)
+      }
+
+      if (!allowed_roles.includes(user.role)) {
         throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED)
       }
 

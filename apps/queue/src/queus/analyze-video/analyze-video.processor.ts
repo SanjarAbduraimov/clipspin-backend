@@ -4,7 +4,6 @@ import { Job } from 'bull'
 import {
   ProjectProgress,
   ProjectStatus,
-  ProjectType,
 } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
@@ -12,9 +11,6 @@ import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 import { R2Service } from 'apps/backend/src/services/r2.service'
 
 import { GenAIService } from '../../services/genai.service'
-import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
-import { TalkingHeadGeneratorQueue } from '../talking-head-generator/talking-head-generator.queue'
-import { TextAudiogramGeneratorQueue } from '../text-audiogram-generator/text-audiogram-generator.queue'
 import {
   ANALYZE_VIDEO_QUEUE_EVENTS,
   ANALYZE_VIDEO_QUEUE_NAME,
@@ -30,9 +26,6 @@ export class AnalyzeVideoQueueProcessor {
     private readonly genai_service: GenAIService,
     private readonly r2_service: R2Service,
     private readonly analyze_video_queue: AnalyzeVideoQueue,
-    private readonly slide_generator_queue: SlideGeneratorQueue,
-    private readonly text_audiogram_generator_queue: TextAudiogramGeneratorQueue,
-    private readonly talkin_head_generator_queue: TalkingHeadGeneratorQueue,
   ) {}
 
   @OnQueueActive()
@@ -82,30 +75,8 @@ export class AnalyzeVideoQueueProcessor {
 
       await this.project_service.update(project.id, {
         input_summary: analysis.text,
+        progress: ProjectProgress.SUMMARY_GENERATED,
       })
-
-      switch (project.type) {
-        case ProjectType.SLIDE_SHOW:
-          this.slide_generator_queue.generate({
-            project_id: project.id,
-          })
-          break
-
-        case ProjectType.TEXT_AUDIOGRAM:
-          this.text_audiogram_generator_queue.generate({
-            project_id: project.id,
-          })
-          break
-
-        case ProjectType.TALKING_HEAD:
-          this.talkin_head_generator_queue.generate({
-            project_id: project.id,
-          })
-          break
-
-        default:
-          break
-      }
     } catch (error) {
       console.log(error)
 

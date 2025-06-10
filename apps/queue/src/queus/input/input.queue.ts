@@ -7,6 +7,7 @@ export const INPUT_QUEUE_NAME = 'input-queue'
 
 export enum INPUT_QUEUE_EVENTS {
   PROCESS = 'process',
+  GENERATE = 'generate',
   TEST = 'test',
 }
 
@@ -18,11 +19,11 @@ export interface InputQueueData {
 export class InputQueue {
   constructor(@InjectQueue(INPUT_QUEUE_NAME) private queue: Queue) {}
 
-  add(data: InputQueueData) {
+  analyze(data: InputQueueData) {
     this.queue.add(INPUT_QUEUE_EVENTS.PROCESS, data)
   }
 
-  test(data: InputQueueData) {
-    this.queue.add(INPUT_QUEUE_EVENTS.TEST, data)
+  generate(data: InputQueueData) {
+    this.queue.add(INPUT_QUEUE_EVENTS.GENERATE, data)
   }
 }
