@@ -6,6 +6,7 @@ import { ProjectModule } from 'apps/backend/src/api/projects/project.module'
 import { CreatomateService } from '../../services/creatomate.service'
 import { FalAIService } from '../../services/falai.service'
 import { OpenAIService } from '../../services/openai.service'
+import { OutputQueueModule } from '../output/output.module'
 import { SlideGeneratorQueueProcessor } from './slide-show-generator.processor'
 import {
   SLIDE_GENERATOR_QUEUE_NAME,
@@ -18,6 +19,7 @@ import {
       name: SLIDE_GENERATOR_QUEUE_NAME,
     }),
     ProjectModule,
+    OutputQueueModule,
   ],
   providers: [
     OpenAIService,

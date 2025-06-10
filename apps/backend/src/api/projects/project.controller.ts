@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
-import { InputQueue } from 'apps/queue/src/queus/input/input.queue'
+import { MainQueue } from 'apps/queue/src/queus/main-queue/main-queue.queue'
 
 import { Context, GetContext } from '../../common/decarators/context.decarator'
 import { Public } from '../../common/decarators/public.decarator'
@@ -23,7 +23,7 @@ export class ProjectController {
   static resource_name = 'project'
   constructor(
     private readonly project_service: ProjectService,
-    private readonly input_queue: InputQueue,
+    private readonly queue: MainQueue,
   ) {}
 
   @Get('/')
@@ -78,7 +78,7 @@ export class ProjectController {
       user: ctx.user?._id,
     })
 
-    this.input_queue.analyze({ project_id: project._id })
+    this.queue.analyze({ project_id: project._id })
 
     return { data: project }
   }
@@ -97,7 +97,7 @@ export class ProjectController {
       })
     }
 
-    this.input_queue.generate({ project_id: project._id })
+    this.queue.generate({ project_id: project._id })
 
     return { data: project }
   }
@@ -178,14 +178,9 @@ export class ProjectController {
       )
 
       if (project) {
-        const result = project.result || {}
+        const video_url = body.event_data.url
 
-        result.video_url = body.event_data.url
-
-        await this.project_service.update(project._id, {
-          status: ProjectStatus.COMPLETED,
-          result,
-        })
+        this.queue.output({ project_id: project._id, video_url })
       }
     }
 

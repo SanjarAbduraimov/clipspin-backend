@@ -13,7 +13,8 @@ export enum ProjectType {
 }
 
 export enum ProjectStatus {
-  PENDING = 'pending',
+  QUEUED = 'queued',
+  IN_PROGRESS = 'in_progress',
   CANCELLED = 'cancelled',
   FAILED = 'failed',
   COMPLETED = 'completed',
@@ -21,11 +22,22 @@ export enum ProjectStatus {
 
 export enum ProjectProgress {
   FETCHING_INPUT = 'fetching_input',
+  INPUT_FETCHED = 'input_fetched',
+
   ANALYZING_INPUT = 'analyzing_input',
-  SUMMARY_GENERATED = 'summary_generated',
+  INPUT_ANALYZED = 'input_analyzed',
+
   GENERATING_SCRIPT = 'generating_script',
+  SCRIPT_GENERATED = 'script_generated',
+
   GENERATING_IMAGES = 'generating_images',
+  IMAGES_GENERATED = 'images_generated',
+
   GENERATING_VIDEO = 'generating_video',
+  VIDEO_GENERATED = 'video_generated',
+
+  SAVING_RESULTS = 'saving_results',
+  RESULTS_SAVED = 'results_saved',
 }
 
 export class Scene {
@@ -66,7 +78,7 @@ export class TalkingHeadScript {
 
 export class ProjectResult {
   @Prop()
-  video_url?: string
+  file_key?: string
 
   @Prop()
   video_id?: string
@@ -110,9 +122,9 @@ export class Project {
   @Prop({
     type: String,
     enum: ProjectStatus,
-    default: ProjectStatus.PENDING,
+    default: ProjectStatus.QUEUED,
   })
-  status: ProjectStatus = ProjectStatus.PENDING
+  status: ProjectStatus = ProjectStatus.QUEUED
 
   @Prop({
     type: String,

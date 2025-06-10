@@ -1,5 +1,6 @@
 import { OnQueueActive, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
+import { Readable } from 'stream'
 
 import {
   ProjectProgress,
@@ -47,7 +48,11 @@ export class AnalyzeVideoQueueProcessor {
 
       const file = await this.r2_service.get_file(project.file_key)
 
-      const file_context = await this.genai_service.upload_file(file)
+      const buffer = await this.r2_service.stream_to_buffer(
+        file.Body as Readable,
+      )
+
+      const file_context = await this.genai_service.upload_file(buffer)
 
       this.analyze_video_queue.analyze_video({
         project_id: project.id,
@@ -75,7 +80,7 @@ export class AnalyzeVideoQueueProcessor {
 
       await this.project_service.update(project.id, {
         input_summary: analysis.text,
-        progress: ProjectProgress.SUMMARY_GENERATED,
+        progress: ProjectProgress.INPUT_ANALYZED,
       })
     } catch (error) {
       console.log(error)

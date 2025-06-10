@@ -1,5 +1,6 @@
 import {
   GetObjectCommand,
+  GetObjectCommandOutput,
   PutObjectCommand,
   S3,
   S3Client,
@@ -58,7 +59,7 @@ export class R2Service {
     return result
   }
 
-  async get_file(key: string): Promise<Buffer> {
+  async get_file(key: string): Promise<GetObjectCommandOutput> {
     const command = new GetObjectCommand({
       Bucket: this.bucket_name,
       Key: key,
@@ -66,6 +67,6 @@ export class R2Service {
 
     const response = await this.client.send(command)
 
-    return this.stream_to_buffer(response.Body as Readable)
+    return response
   }
 }

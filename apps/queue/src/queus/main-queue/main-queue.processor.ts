@@ -9,23 +9,25 @@ import {
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
 import { InstagramParserQueue } from '../instagram-parser/instagram-parser.queue'
+import { OutputQueue, OutputQueueData } from '../output/output.queue'
 import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
 import { TalkingHeadGeneratorQueue } from '../talking-head-generator/talking-head-generator.queue'
 import { TextAudiogramGeneratorQueue } from '../text-audiogram-generator/text-audiogram-generator.queue'
 import {
-  INPUT_QUEUE_EVENTS,
-  INPUT_QUEUE_NAME,
-  InputQueueData,
-} from './input.queue'
+  MAIN_QUEUE_EVENTS,
+  MAIN_QUEUE_NAME,
+  MainQueueData,
+} from './main-queue.queue'
 
-@Processor(INPUT_QUEUE_NAME)
-export class InputQueueProcessor {
+@Processor(MAIN_QUEUE_NAME)
+export class MainQueueProcessor {
   constructor(
     private readonly instagram_parser_queue: InstagramParserQueue,
     private readonly slide_generator_queue: SlideGeneratorQueue,
     private readonly project_service: ProjectService,
     private readonly text_audiogram_generator_queue: TextAudiogramGeneratorQueue,
     private readonly talking_head_generator_queue: TalkingHeadGeneratorQueue,
+    private readonly output_queue: OutputQueue,
     private readonly test_queue: TalkingHeadGeneratorQueue,
   ) {}
 
@@ -37,15 +39,15 @@ export class InputQueueProcessor {
     )
   }
 
-  @Process(INPUT_QUEUE_EVENTS.PROCESS)
-  async analyze(job: Job<InputQueueData>) {
+  @Process(MAIN_QUEUE_EVENTS.PROCESS)
+  async analyze(job: Job<MainQueueData>) {
     this.instagram_parser_queue.download_video({
       project_id: job.data.project_id,
     })
   }
 
-  @Process(INPUT_QUEUE_EVENTS.GENERATE)
-  async generate(job: Job<InputQueueData>) {
+  @Process(MAIN_QUEUE_EVENTS.GENERATE)
+  async generate(job: Job<MainQueueData>) {
     try {
       const project = await this.project_service.retrieve(job.data.project_id)
 
@@ -80,8 +82,13 @@ export class InputQueueProcessor {
     }
   }
 
-  @Process(INPUT_QUEUE_EVENTS.TEST)
-  async test(job: Job<InputQueueData>) {
+  @Process(MAIN_QUEUE_EVENTS.OUTPUT)
+  async output(job: Job<OutputQueueData>) {
+    this.output_queue.save(job.data)
+  }
+
+  @Process(MAIN_QUEUE_EVENTS.TEST)
+  async test(job: Job<MainQueueData>) {
     this.test_queue.generate_video({
       project_id: job.data.project_id,
     })

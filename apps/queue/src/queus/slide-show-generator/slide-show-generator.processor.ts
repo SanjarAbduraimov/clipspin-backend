@@ -14,6 +14,7 @@ import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 import { CreatomateService } from '../../services/creatomate.service'
 import { FalAIService } from '../../services/falai.service'
 import { OpenAIService } from '../../services/openai.service'
+import { OutputQueue } from '../output/output.queue'
 import {
   GenerateSlidesData,
   SLIDE_GENERATOR_QUEUE_EVENTS,
@@ -32,6 +33,7 @@ export class SlideGeneratorQueueProcessor {
     private readonly falai_service: FalAIService,
     private readonly creatomate_service: CreatomateService,
     private readonly slide_generator_queue: SlideGeneratorQueue,
+    private readonly output_queue: OutputQueue,
   ) {
     const token = this.config_service.get('apify.token')
 
@@ -65,6 +67,7 @@ export class SlideGeneratorQueueProcessor {
         scenes: scenes.filter(
           (item) => item.image_prompt && item.voiceover_script,
         ),
+        progress: ProjectProgress.SCRIPT_GENERATED,
       })
 
       this.slide_generator_queue.generate_scene_images({
@@ -99,6 +102,7 @@ export class SlideGeneratorQueueProcessor {
 
       await this.project_service.update(project.id, {
         scenes,
+        progress: ProjectProgress.IMAGES_GENERATED,
       })
 
       this.slide_generator_queue.generate_video({
@@ -126,12 +130,11 @@ export class SlideGeneratorQueueProcessor {
         scenes: project.scenes,
       })
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.COMPLETED,
-        result: {
-          video_url,
-        },
+      await this.project_service.update(project._id, {
+        progress: ProjectProgress.VIDEO_GENERATED,
       })
+
+      this.output_queue.save({ project_id: project._id, video_url })
     } catch (error) {
       console.log(error)
 

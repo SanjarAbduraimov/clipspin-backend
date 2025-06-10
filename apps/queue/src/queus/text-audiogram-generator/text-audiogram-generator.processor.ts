@@ -13,6 +13,7 @@ import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 import { CreatomateService } from '../../services/creatomate.service'
 import { FalAIService } from '../../services/falai.service'
 import { OpenAIService } from '../../services/openai.service'
+import { OutputQueue } from '../output/output.queue'
 import {
   GenerateTextAudiogramData,
   TEXT_AUDIOGRAM_GENERATOR_QUEUE_EVENTS,
@@ -31,6 +32,7 @@ export class TextAudiogramGeneratorQueueProcessor {
     private readonly falai_service: FalAIService,
     private readonly creatomate_service: CreatomateService,
     private readonly text_audiogram_generator_queue: TextAudiogramGeneratorQueue,
+    private readonly output_queue: OutputQueue,
   ) {
     const token = this.config_service.get('apify.token')
 
@@ -117,12 +119,7 @@ export class TextAudiogramGeneratorQueueProcessor {
         script: project.script,
       })
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.COMPLETED,
-        result: {
-          video_url,
-        },
-      })
+      this.output_queue.save({ project_id: project._id, video_url })
     } catch (error) {
       console.log(error)
 

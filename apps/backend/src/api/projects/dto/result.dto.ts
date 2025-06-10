@@ -5,5 +5,5 @@ export class ProjectResultDTO {
   @Expose()
   @IsString()
   @IsOptional()
-  video_url?: string
+  file_key?: string
 }

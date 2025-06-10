@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 
-import { InputQueueModule } from 'apps/queue/src/queus/input/input.module'
+import { MainQueueModule } from 'apps/queue/src/queus/main-queue/main-queue.module'
 
 import { Project, ProjectSchema } from '../../models/project.schema'
 import { ProjectController } from './project.controller'
@@ -16,7 +16,7 @@ import { ProjectService } from './project.service'
         schema: ProjectSchema,
       },
     ]),
-    InputQueueModule,
+    MainQueueModule,
   ],
   controllers: [ProjectController],
   providers: [ProjectService],

@@ -100,6 +100,7 @@ export class InstagramParserQueueProcessor {
       const project = await this.project_service.retrieve(job.data.project_id)
 
       await this.project_service.update(project._id, {
+        status: ProjectStatus.IN_PROGRESS,
         progress: ProjectProgress.FETCHING_INPUT,
       })
 
@@ -111,6 +112,7 @@ export class InstagramParserQueueProcessor {
 
       await this.project_service.update(project._id, {
         file_key: path,
+        progress: ProjectProgress.INPUT_FETCHED,
       })
 
       this.analyze_video_queue.upload_video({ project_id: project._id })

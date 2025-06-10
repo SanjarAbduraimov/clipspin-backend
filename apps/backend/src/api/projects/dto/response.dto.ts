@@ -13,7 +13,13 @@ export class ProjectResponseDTO {
   title: string
 
   @Expose()
+  type: string
+
+  @Expose()
   input_video_url: string
+
+  @Expose()
+  file_key: string
 
   @Expose()
   input_summary: string
