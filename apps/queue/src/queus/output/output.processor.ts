@@ -8,6 +8,7 @@ import {
 } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
+import { UserBalanceService } from 'apps/backend/src/api/user-balance/user-balance.service'
 
 import { R2Service } from 'apps/backend/src/services/r2.service'
 
@@ -22,6 +23,7 @@ export class OutputQueueProcessor {
   constructor(
     private readonly project_service: ProjectService,
     private readonly r2_service: R2Service,
+    private readonly user_balance_service: UserBalanceService,
   ) {}
 
   @OnQueueActive()
@@ -66,6 +68,17 @@ export class OutputQueueProcessor {
         progress: ProjectProgress.SAVING_RESULTS,
       })
 
+      // CHECK: balance before any processing
+      const user_balance = await this.user_balance_service.getBalance(
+        project.user.toString(),
+      )
+      if (!user_balance || user_balance.credits < project.credit_cost) {
+        await this.project_service.update(project._id, {
+          status: ProjectStatus.FAILED,
+        })
+        return
+      }
+
       const video_buffer = await this.download_video(job.data.video_url)
 
       const path = await this.save_video(video_buffer)
@@ -78,7 +91,14 @@ export class OutputQueueProcessor {
         result,
         progress: ProjectProgress.RESULTS_SAVED,
       })
-      console.log(project)
+
+      if (project.credit_cost) {
+        await this.user_balance_service.deductCredits(
+          project.user.toString(),
+          project.credit_cost,
+          `Project ${project._id} completed`,
+        )
+      }
     } catch (error) {
       console.log(error)
 
