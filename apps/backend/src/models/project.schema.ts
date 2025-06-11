@@ -134,6 +134,9 @@ export class Project {
 
   @Prop({ type: Scene })
   result?: ProjectResult
+
+  @Prop()
+  credit_cost?: number
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project)

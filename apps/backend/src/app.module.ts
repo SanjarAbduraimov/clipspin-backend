@@ -7,9 +7,11 @@ import { MongooseModule } from '@nestjs/mongoose'
 
 import { AuthGuard } from './api/auth/auth.guard'
 import { AuthModule } from './api/auth/auth.module'
+import { CreditConfigModule } from './api/credit-config/credit-config.module'
 import { FileModule } from './api/files/file.module'
 import { ProfileModule } from './api/profile/profile.module'
 import { ProjectModule } from './api/projects/project.module'
+import { UserBalanceModule } from './api/user-balance/user-balance.module'
 import configuration from './config'
 
 @Module({
@@ -49,6 +51,8 @@ import configuration from './config'
     ProfileModule,
     ProjectModule,
     FileModule,
+    CreditConfigModule,
+    UserBalanceModule,
   ],
   controllers: [],
   providers: [

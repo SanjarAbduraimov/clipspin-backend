@@ -1,3 +1,5 @@
+import { ProjectType } from './models/project.schema'
+
 /* eslint-disable */
 export default async () => {
   const t = {
@@ -120,6 +122,53 @@ export default async () => {
             },
           },
         ],
+        [
+          import('./models/credit-config.schema'),
+          {
+            CreditConfig: {
+              project_type: { required: true, type: () => String },
+              credit_cost: { required: true, type: () => Number },
+              description: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/credit-config/dto/create.dto'),
+          {
+            CreateCreditConfigDTO: {
+              project_type: {
+                required: true,
+                enum: ProjectType,
+              },
+              credit_cost: { required: true, type: () => Number },
+              description: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/credit-config/dto/update.dto'),
+          {
+            UpdateCreditConfigDTO: {
+              project_type: {
+                required: false,
+                enum: ProjectType,
+              },
+              credit_cost: { required: false, type: () => Number },
+              description: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/credit-config/dto/response.dto'),
+          {
+            CreditConfigResponseDTO: {
+              _id: { required: true, type: () => String },
+              project_type: { required: true, type: () => String },
+              credit_cost: { required: true, type: () => Number },
+              description: { required: false, type: () => String },
+            },
+          },
+        ],
       ],
       controllers: [
         [
@@ -134,6 +183,18 @@ export default async () => {
           import('./api/projects/project.controller'),
           {
             ProjectController: {
+              getAll: {},
+              get: {},
+              create: {},
+              update: {},
+              delete: {},
+            },
+          },
+        ],
+        [
+          import('./api/credit-config/credit-config.controller'),
+          {
+            CreditConfigController: {
               getAll: {},
               get: {},
               create: {},

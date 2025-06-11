@@ -6,6 +6,7 @@ import { PassportModule } from '@nestjs/passport'
 import { OTP, OTPSchema } from '../../models/otp.schema'
 import { User, UserSchema } from '../../models/user.schema'
 import { EmailService } from '../../services/email.service'
+import { UserBalanceModule } from '../user-balance/user-balance.module'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { GoogleStrategy } from './strategies/google.strategy'
@@ -17,6 +18,7 @@ import { GoogleStrategy } from './strategies/google.strategy'
     MongooseModule.forFeature([{ name: OTP.name, schema: OTPSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     ConfigModule,
+    UserBalanceModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, EmailService, GoogleStrategy],

@@ -74,7 +74,9 @@ export class AuthService {
       { upsert: true, new: true },
     )
 
-    return this.jwtService.signAsync({ user: user._id })
+    const access_token = await this.jwtService.signAsync({ user: user._id })
+
+    return { access_token, user }
   }
 
   async getUser(id: Types.ObjectId) {

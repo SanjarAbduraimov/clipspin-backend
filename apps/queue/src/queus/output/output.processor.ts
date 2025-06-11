@@ -78,6 +78,7 @@ export class OutputQueueProcessor {
         result,
         progress: ProjectProgress.RESULTS_SAVED,
       })
+      console.log(project)
     } catch (error) {
       console.log(error)
 

@@ -19,6 +19,7 @@ import { Public } from '../../common/decarators/public.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
 import { ErrorMessage } from '../../constants/errors'
 import { EmailService } from '../../services/email.service'
+import { UserBalanceService } from '../user-balance/user-balance.service'
 import { AuthService } from './auth.service'
 import { GoogleAuthDTO, GoogleAuthResponseDTO } from './dto/google-auth.dto'
 import { OTPResponseDTO, SendOTPPhoneEmailDTO } from './dto/otp.dto'
@@ -31,6 +32,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
+    private readonly user_balance_service: UserBalanceService,
   ) {}
 
   @Public()
@@ -67,9 +69,12 @@ export class AuthController {
       throw new NotFoundException(ErrorMessage.INVALID_OTP_CODE)
     }
 
-    const access_token = await this.authService.signIn({
+    const { access_token, user } = await this.authService.signIn({
       email,
     })
+
+    // create user balance default
+    await this.user_balance_service.setUpUserbalance(user._id)
 
     await this.authService.deleteOTP(otp._id)
 
