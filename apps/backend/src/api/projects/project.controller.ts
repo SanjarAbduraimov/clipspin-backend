@@ -56,10 +56,7 @@ export class ProjectController {
   @Get('/:id')
   @ResponseDTO(ProjectResponseDTO)
   async get(@GetContext() ctx: Context, @Param('id') id: string) {
-    const project = await this.project_service.find(
-      { _id: id, user: ctx.user._id },
-      ctx,
-    )
+    const project = await this.project_service.retrieve(id, ctx)
 
     if (!project) {
       throw new NotFoundError(ProjectController.resource_name, {
