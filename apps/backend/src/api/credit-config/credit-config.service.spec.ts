@@ -1,18 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CreditConfigService } from './credit-config.service';
+import { Test, TestingModule } from '@nestjs/testing'
+
+import { CreditConfigService } from './credit-config.service'
 
 describe('CreditConfigService', () => {
-  let service: CreditConfigService;
+  let service: CreditConfigService
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [CreditConfigService],
-    }).compile();
+    }).compile()
 
-    service = module.get<CreditConfigService>(CreditConfigService);
-  });
+    service = module.get<CreditConfigService>(CreditConfigService)
+  })
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
+    expect(service).toBeDefined()
+  })
+})
