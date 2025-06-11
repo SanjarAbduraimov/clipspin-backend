@@ -91,7 +91,7 @@ export class TalkingHeadGeneratorQueueProcessor {
         },
       })
     } catch (error) {
-      console.log(error)
+      console.log(error?.response?.data || error?.message)
 
       await this.project_service.update(job.data.project_id, {
         status: ProjectStatus.FAILED,
