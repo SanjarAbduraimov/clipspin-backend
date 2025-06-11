@@ -77,6 +77,7 @@ export class OutputQueueProcessor {
       await this.project_service.update(project._id, {
         result,
         progress: ProjectProgress.RESULTS_SAVED,
+        status: ProjectStatus.COMPLETED,
       })
     } catch (error) {
       console.log(error)
