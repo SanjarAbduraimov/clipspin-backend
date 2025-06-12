@@ -12,6 +12,12 @@ export enum ProjectType {
   PROFESSIONAL = 'professional',
 }
 
+export enum ProjectInputSource {
+  YOUTUBE = 'slide_show',
+  INSTAGRAM = 'text_audiogram',
+  TIKTOK = 'tiktok',
+}
+
 export enum ProjectStatus {
   QUEUED = 'queued',
   IN_PROGRESS = 'in_progress',
@@ -100,6 +106,12 @@ export class Project {
 
   @Prop()
   input_video_url: string
+
+  @Prop({
+    type: String,
+    enum: ProjectInputSource,
+  })
+  input_video_source: ProjectInputSource
 
   @Prop()
   file_key?: string

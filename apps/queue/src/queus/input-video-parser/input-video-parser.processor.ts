@@ -5,6 +5,7 @@ import { Job } from 'bull'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
+  ProjectInputSource,
   ProjectProgress,
   ProjectStatus,
 } from 'apps/backend/src/models/project.schema'
@@ -16,12 +17,17 @@ import { R2Service } from 'apps/backend/src/services/r2.service'
 import { AnalyzeVideoQueue } from '../analyze-video/analyze-video.queue'
 import {
   DownloadVideoData,
-  INSTAGRAM_PARSER_QUEUE_EVENTS,
-  INSTAGRAM_PARSER_QUEUE_NAME,
-} from './instagram-parser.queue'
+  INPUT_VIDEO_PARSER_QUEUE_EVENTS,
+  INPUT_VIDEO_PARSER_QUEUE_NAME,
+} from './input-video-parser.queue'
 
-@Processor(INSTAGRAM_PARSER_QUEUE_NAME)
-export class InstagramParserQueueProcessor {
+interface InputDownloadURLResponse {
+  url: string
+  source: ProjectInputSource
+}
+
+@Processor(INPUT_VIDEO_PARSER_QUEUE_NAME)
+export class InputVideoParserQueueProcessor {
   client: ApifyClient
 
   constructor(
@@ -45,7 +51,7 @@ export class InstagramParserQueueProcessor {
     )
   }
 
-  async get_download_url(url: string): Promise<string> {
+  async get_instagram_video(url: string): Promise<InputDownloadURLResponse> {
     const input = {
       directUrls: [url],
       resultsType: 'posts',
@@ -66,7 +72,92 @@ export class InstagramParserQueueProcessor {
       throw new Error('Video URL not found in the dataset items')
     }
 
-    return video_url as string
+    return {
+      url: video_url as string,
+      source: ProjectInputSource.INSTAGRAM,
+    }
+  }
+
+  async get_tiktok_video(url: string): Promise<InputDownloadURLResponse> {
+    const input = {
+      startUrls: [url],
+      dateRange: 'DEFAULT',
+      location: 'US',
+    }
+
+    const run = await this.client.actor('apidojo/tiktok-scraper').call(input)
+
+    const { items } = await this.client
+      .dataset(run.defaultDatasetId)
+      .listItems()
+
+    const video_url = (items[0]?.video as any)?.url
+
+    if (!video_url) {
+      throw new Error('Video URL not found in the dataset items')
+    }
+
+    return {
+      url: video_url as string,
+      source: ProjectInputSource.TIKTOK,
+    }
+  }
+
+  async get_youtube_video(url: string): Promise<InputDownloadURLResponse> {
+    const input = {
+      startUrls: [url],
+      proxy: {
+        useApifyProxy: true,
+      },
+    }
+
+    const run = await this.client
+      .actor('epctex/youtube-video-downloader')
+      .call(input)
+
+    const { items } = await this.client
+      .dataset(run.defaultDatasetId)
+      .listItems()
+
+    const video_url = items[0]?.downloadUrl
+
+    if (!video_url) {
+      throw new Error('Video URL not found in the dataset items')
+    }
+
+    return {
+      url: video_url as string,
+      source: ProjectInputSource.YOUTUBE,
+    }
+  }
+
+  get_download_url(url: string) {
+    let hostname: string
+
+    try {
+      const parsed_url = new URL(url)
+      hostname = parsed_url.hostname.replace('www.', '')
+    } catch (error) {
+      throw new Error('Invalid URL')
+    }
+
+    switch (hostname) {
+      case 'instagram.com':
+      case 'www.instagram.com':
+        return this.get_instagram_video(url)
+
+      case 'tiktok.com':
+      case 'www.tiktok.com':
+      case 'vt.tiktok.com':
+        return this.get_tiktok_video(url)
+
+      case 'youtube.com':
+      case 'www.youtube.com':
+      case 'youtu.be':
+        return this.get_youtube_video(url)
+      default:
+        throw new Error(`Unsupported URL domain: ${hostname}`)
+    }
   }
 
   async download_video(url: string): Promise<Buffer> {
@@ -94,7 +185,7 @@ export class InstagramParserQueueProcessor {
     return key
   }
 
-  @Process(INSTAGRAM_PARSER_QUEUE_EVENTS.DOWNLOAD_VIDEO)
+  @Process(INPUT_VIDEO_PARSER_QUEUE_EVENTS.DOWNLOAD_VIDEO)
   async process(job: Job<DownloadVideoData>) {
     try {
       const project = await this.project_service.retrieve(job.data.project_id)
@@ -104,7 +195,9 @@ export class InstagramParserQueueProcessor {
         progress: ProjectProgress.FETCHING_INPUT,
       })
 
-      const video_url = await this.get_download_url(project.input_video_url)
+      const { url: video_url, source } = await this.get_download_url(
+        project.input_video_url,
+      )
 
       const video_buffer = await this.download_video(video_url)
 
@@ -113,6 +206,7 @@ export class InstagramParserQueueProcessor {
       await this.project_service.update(project._id, {
         file_key: path,
         progress: ProjectProgress.INPUT_FETCHED,
+        input_video_source: source,
       })
 
       this.analyze_video_queue.upload_video({ project_id: project._id })
