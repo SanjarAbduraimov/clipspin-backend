@@ -47,6 +47,7 @@ export class HeygenService {
           background: {
             type: 'image',
             url: 'https://livestorm.imgix.net/1127/1642785626-office_003.jpg',
+            fit: 'crop',
           },
         },
       ],
