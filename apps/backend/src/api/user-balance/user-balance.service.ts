@@ -116,9 +116,7 @@ export class UserBalanceService extends BaseService<UserBalance> {
     const available_credits = user_balance.credits - total_pending_credits
 
     if (available_credits < credit_cost) {
-      throw new BadRequestException(
-        'Insufficient credits considering pending projects',
-      )
+      throw new BadRequestException('Insufficient credits ')
     }
 
     return credit_cost

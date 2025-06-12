@@ -90,6 +90,7 @@ export class OutputQueueProcessor {
       await this.project_service.update(project._id, {
         result,
         progress: ProjectProgress.RESULTS_SAVED,
+        status: ProjectStatus.COMPLETED,
       })
 
       if (project.credit_cost) {
