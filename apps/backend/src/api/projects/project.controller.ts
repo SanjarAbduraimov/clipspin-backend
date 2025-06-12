@@ -106,6 +106,27 @@ export class ProjectController {
       throw new BadRequestException('Insufficent balance')
     }
 
+    const pending_projects = await this.project_service.list(
+      {
+        user: ctx.user._id,
+        status: { $in: [ProjectStatus.QUEUED, ProjectStatus.IN_PROGRESS] },
+      },
+      ctx,
+    )
+
+    const total_pending_credits = pending_projects.reduce(
+      (acc, p) => acc + (p.credit_cost || 0),
+      0,
+    )
+
+    const available_credits = user_balance.credits - total_pending_credits
+
+    if (available_credits < credit_cost) {
+      throw new BadRequestException(
+        'Insufficient credits considering pending projects',
+      )
+    }
+
     const project = await this.project_service.create({
       ...body,
       user: ctx.user?._id,
