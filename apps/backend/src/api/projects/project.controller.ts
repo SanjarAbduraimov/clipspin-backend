@@ -1,14 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
 import { MainQueue } from 'apps/queue/src/queus/main-queue/main-queue.queue'
@@ -20,7 +10,6 @@ import { AllowedRoles } from '../../common/decarators/role.decarator'
 import { UserRole } from '../../common/enums/role.enum'
 import { NotFoundError } from '../../common/errors/not-fount.error'
 import { ProjectStatus, ProjectType } from '../../models/project.schema'
-import { CreditConfigService } from '../credit-config/credit-config.service'
 import { UserBalanceService } from '../user-balance/user-balance.service'
 import { CreateProjectDTO } from './dto/create.dto'
 import { ProjectResponseDTO } from './dto/response.dto'
@@ -36,7 +25,6 @@ export class ProjectController {
   constructor(
     private readonly project_service: ProjectService,
     private readonly queue: MainQueue,
-    private readonly credit_config_service: CreditConfigService,
     private readonly user_balance_service: UserBalanceService,
   ) {}
 
@@ -87,45 +75,11 @@ export class ProjectController {
   @Post('/')
   @ResponseDTO(ProjectResponseDTO)
   async create(@Body() body: CreateProjectDTO, @GetContext() ctx: Context) {
-    const credit_config = await this.credit_config_service.find({
-      project_type: body.type,
-    })
-
-    //credit
-    const credit_cost = credit_config.credit_cost
-
-    const user_balance = await this.user_balance_service.getBalance(
-      ctx.user._id,
-    )
-
-    if (!user_balance) {
-      throw new NotFoundException()
-    }
-
-    if (user_balance.credits < credit_cost) {
-      throw new BadRequestException('Insufficent balance')
-    }
-
-    const pending_projects = await this.project_service.list(
-      {
-        user: ctx.user._id,
-        status: { $in: [ProjectStatus.QUEUED, ProjectStatus.IN_PROGRESS] },
-      },
-      ctx,
-    )
-
-    const total_pending_credits = pending_projects.reduce(
-      (acc, p) => acc + (p.credit_cost || 0),
-      0,
-    )
-
-    const available_credits = user_balance.credits - total_pending_credits
-
-    if (available_credits < credit_cost) {
-      throw new BadRequestException(
-        'Insufficient credits considering pending projects',
+    const credit_cost =
+      await this.user_balance_service.ensureUserHasEnoughCredits(
+        ctx.user._id,
+        body.type,
       )
-    }
 
     const project = await this.project_service.create({
       ...body,

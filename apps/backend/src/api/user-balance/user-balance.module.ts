@@ -5,6 +5,7 @@ import {
   UserBalance,
   UserBalanceSchema,
 } from '../../models/user-balance.schema'
+import { CreditConfigModule } from '../credit-config/credit-config.module'
 import { UserBalanceController } from './user-balance.controller'
 import { UserBalanceService } from './user-balance.service'
 
@@ -16,6 +17,7 @@ import { UserBalanceService } from './user-balance.service'
         schema: UserBalanceSchema,
       },
     ]),
+    CreditConfigModule,
   ],
   providers: [UserBalanceService],
   controllers: [UserBalanceController],
