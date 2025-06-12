@@ -64,7 +64,7 @@ export class UserBalanceService extends BaseService<UserBalance> {
     reason?: string,
   ) {
     const balance = await this.user_balance_model.findOne({
-      user_id: new Types.ObjectId(user_id),
+      user: new Types.ObjectId(user_id),
     })
 
     balance.credits -= amount
