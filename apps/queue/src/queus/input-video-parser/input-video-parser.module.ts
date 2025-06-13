@@ -6,21 +6,21 @@ import { ProjectModule } from 'apps/backend/src/api/projects/project.module'
 import { R2Service } from 'apps/backend/src/services/r2.service'
 
 import { AnalyzeVideoQueueModule } from '../analyze-video/analyze-video.module'
-import { InstagramParserQueueProcessor } from './instagram-parser.processor'
+import { InputVideoParserQueueProcessor } from './input-video-parser.processor'
 import {
-  INSTAGRAM_PARSER_QUEUE_NAME,
-  InstagramParserQueue,
-} from './instagram-parser.queue'
+  INPUT_VIDEO_PARSER_QUEUE_NAME,
+  InputVideoParserQueue,
+} from './input-video-parser.queue'
 
 @Module({
   imports: [
     BullModule.registerQueue({
-      name: INSTAGRAM_PARSER_QUEUE_NAME,
+      name: INPUT_VIDEO_PARSER_QUEUE_NAME,
     }),
     ProjectModule,
     AnalyzeVideoQueueModule,
   ],
-  providers: [InstagramParserQueue, InstagramParserQueueProcessor, R2Service],
-  exports: [InstagramParserQueue],
+  providers: [InputVideoParserQueue, InputVideoParserQueueProcessor, R2Service],
+  exports: [InputVideoParserQueue],
 })
-export class InstagramParserQueueModule {}
+export class InputVideoParserQueueModule {}

@@ -35,14 +35,19 @@ export class HeygenService {
         {
           character: {
             type: 'avatar',
-            avatar_id: 'Abigail_expressive_2024112501',
+            avatar_id: 'Georgia_expressive_2024112701',
             avatar_style: 'normal',
           },
           voice: {
             type: 'text',
             input_text: script,
-            voice_id: 'f772a099cbb7421eb0176240c611fc43',
+            voice_id: '511ffd086a904ef593b608032004112c',
             speed: 1,
+          },
+          background: {
+            type: 'image',
+            url: 'https://livestorm.imgix.net/1127/1642785626-office_003.jpg',
+            fit: 'crop',
           },
         },
       ],
@@ -50,9 +55,7 @@ export class HeygenService {
         width: 720,
         height: 1280,
       },
-      background: {
-        type: 'transparent',
-      },
+
       option: {
         remove_logo: true,
       },

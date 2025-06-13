@@ -6,7 +6,7 @@ import { Job } from 'bull'
 import {
   ProjectProgress,
   ProjectStatus,
-  Scene,
+  SlideShowScene,
 } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
@@ -60,13 +60,15 @@ export class SlideGeneratorQueueProcessor {
       })
 
       const scenes = await this.openai_service.generate_scenes({
-        description: project.input_summary,
+        description: project.selected_idea.script,
       })
 
       await this.project_service.update(project.id, {
-        scenes: scenes.filter(
-          (item) => item.image_prompt && item.voiceover_script,
-        ),
+        slide_show_data: {
+          scenes: scenes.filter(
+            (item) => item.image_prompt && item.voiceover_script,
+          ),
+        },
         progress: ProjectProgress.SCRIPT_GENERATED,
       })
 
@@ -87,9 +89,9 @@ export class SlideGeneratorQueueProcessor {
         progress: ProjectProgress.GENERATING_IMAGES,
       })
 
-      const scenes: Scene[] = []
+      const scenes: SlideShowScene[] = []
 
-      for (const scene of project.scenes) {
+      for (const scene of project.slide_show_data.scenes) {
         const image = await this.falai_service.generate_image({
           prompt: scene.image_prompt,
         })
@@ -101,7 +103,7 @@ export class SlideGeneratorQueueProcessor {
       }
 
       await this.project_service.update(project.id, {
-        scenes,
+        slide_show_data: { scenes },
         progress: ProjectProgress.IMAGES_GENERATED,
       })
 
@@ -127,7 +129,7 @@ export class SlideGeneratorQueueProcessor {
       })
 
       const video_url = await this.creatomate_service.generate_slide_show({
-        scenes: project.scenes,
+        scenes: project.slide_show_data.scenes,
       })
 
       await this.project_service.update(project._id, {

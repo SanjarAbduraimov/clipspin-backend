@@ -8,7 +8,7 @@ import { R2Service } from 'apps/backend/src/services/r2.service'
 import configuration from 'apps/backend/src/config'
 
 import { AnalyzeVideoQueueModule } from './queus/analyze-video/analyze-video.module'
-import { InstagramParserQueueModule } from './queus/instagram-parser/instagram-parser.module'
+import { InputVideoParserQueueModule } from './queus/input-video-parser/input-video-parser.module'
 import { MainQueueModule } from './queus/main-queue/main-queue.module'
 import { MainQueueProcessor } from './queus/main-queue/main-queue.processor'
 import { OutputQueueModule } from './queus/output/output.module'
@@ -44,7 +44,7 @@ import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-genera
     TextAudiogramGeneratorQueueModule,
     SlideGeneratorQueueModule,
     AnalyzeVideoQueueModule,
-    InstagramParserQueueModule,
+    InputVideoParserQueueModule,
     OutputQueueModule,
     MainQueueModule,
   ],

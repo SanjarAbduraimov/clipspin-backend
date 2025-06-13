@@ -59,11 +59,11 @@ export class TextAudiogramGeneratorQueueProcessor {
       })
 
       const script = await this.openai_service.generate_script({
-        description: project.input_summary,
+        description: project.selected_idea.script,
       })
 
       await this.project_service.update(project.id, {
-        script,
+        text_audiogram_data: script,
       })
 
       this.text_audiogram_generator_queue.generate_scene_image({
@@ -84,12 +84,12 @@ export class TextAudiogramGeneratorQueueProcessor {
       })
 
       const image = await this.falai_service.generate_image({
-        prompt: project.script.image_prompt,
+        prompt: project.text_audiogram_data.image_prompt,
       })
 
       await this.project_service.update(project.id, {
-        script: {
-          ...project.script,
+        text_audiogram_data: {
+          ...project.text_audiogram_data,
           image_url: image.url,
         },
       })
@@ -116,7 +116,7 @@ export class TextAudiogramGeneratorQueueProcessor {
       })
 
       const video_url = await this.creatomate_service.generate_text_audiogram({
-        script: project.script,
+        script: project.text_audiogram_data,
       })
 
       this.output_queue.save({ project_id: project._id, video_url })

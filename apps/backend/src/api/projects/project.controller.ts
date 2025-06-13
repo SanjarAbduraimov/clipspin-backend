@@ -13,7 +13,7 @@ import { ProjectStatus, ProjectType } from '../../models/project.schema'
 import { UserBalanceService } from '../user-balance/user-balance.service'
 import { CreateProjectDTO } from './dto/create.dto'
 import { ProjectResponseDTO } from './dto/response.dto'
-import { ProjectResultDTO } from './dto/result.dto'
+import { ProjectOutputDTO } from './dto/result.dto'
 import { UpdateProjectDTO } from './dto/update.dto'
 import { ProjectService } from './project.service'
 
@@ -58,10 +58,7 @@ export class ProjectController {
   @Get('/:id')
   @ResponseDTO(ProjectResponseDTO)
   async get(@GetContext() ctx: Context, @Param('id') id: string) {
-    const project = await this.project_service.find(
-      { _id: id, user: ctx.user._id },
-      ctx,
-    )
+    const project = await this.project_service.retrieve(id, ctx)
 
     if (!project) {
       throw new NotFoundError(ProjectController.resource_name, {
@@ -117,7 +114,7 @@ export class ProjectController {
   async submit_result(
     @GetContext() ctx: Context,
     @Param('id') id: string,
-    @Body() body: ProjectResultDTO,
+    @Body() body: ProjectOutputDTO,
   ) {
     let project = await this.project_service.find({ _id: id }, ctx)
 
@@ -129,7 +126,7 @@ export class ProjectController {
 
     project = await this.project_service.update(
       id,
-      { result: body, status: ProjectStatus.COMPLETED },
+      { output: body, status: ProjectStatus.COMPLETED },
       ctx,
     )
 

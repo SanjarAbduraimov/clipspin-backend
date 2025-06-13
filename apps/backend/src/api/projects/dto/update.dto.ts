@@ -1,15 +1,19 @@
-import { IsOptional, IsString } from 'class-validator'
+import { Type } from 'class-transformer'
+import { IsObject, IsOptional, IsString, ValidateNested } from 'class-validator'
+
+class ProjectIdeaDTO {
+  @IsString()
+  script: string
+}
 
 export class UpdateProjectDTO {
   @IsString()
   @IsOptional()
   title?: string
 
-  @IsString()
+  @IsObject()
   @IsOptional()
-  input_video_url?: string
-
-  @IsString()
-  @IsOptional()
-  input_summary: string
+  @Type(() => ProjectIdeaDTO)
+  @ValidateNested()
+  selected_idea?: ProjectIdeaDTO
 }
