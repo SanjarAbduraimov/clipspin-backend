@@ -27,11 +27,13 @@ export const validation_schema = Joi.object({
   R2_ACCESS_KEY_SECRET: Joi.string().required(),
   R2_ENDPOINT: Joi.string().required(),
   R2_BUCKET_NAME: Joi.string().required(),
+  STRIPE_SECRET_KEY: Joi.string().required(),
 })
 
 export const configuration = () => ({
   env: process.env.NODE_ENV,
   port: parseInt(process.env.PORT, 10),
+  frontend_url: parseInt(process.env.FRONTEND_URL, 10),
   database: {
     uri: process.env.DATABASE_URI,
     user: process.env.DATABASE_USER,
@@ -74,6 +76,9 @@ export const configuration = () => ({
     access_key_secret: process.env.R2_ACCESS_KEY_SECRET,
     endpoint: process.env.R2_ENDPOINT,
     bucket_name: process.env.R2_BUCKET_NAME,
+  },
+  stripe: {
+    secret_key: process.env.STRIPE_SECRET_KEY,
   },
 })
 

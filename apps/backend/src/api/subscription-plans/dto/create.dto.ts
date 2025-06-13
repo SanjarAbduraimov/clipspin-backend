@@ -2,7 +2,7 @@ import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator'
 
 import { ProjectType } from 'apps/backend/src/models/project.schema'
 
-export class CreateCreditConfigDTO {
+export class CreateSubscriptionPlanDTO {
   @IsEnum(ProjectType)
   project_type: ProjectType
 

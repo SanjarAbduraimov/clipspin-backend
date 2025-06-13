@@ -1,7 +1,7 @@
 import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
 
-import { UserBalanceModule } from 'apps/backend/src/api/user-balance/user-balance.module'
+import { UserSubscriptionModule } from 'apps/backend/src/api/user-subscriptions/user-subscription.module'
 
 import { R2Service } from 'apps/backend/src/services/r2.service'
 
@@ -13,7 +13,7 @@ import { OUTPUT_QUEUE_NAME, OutputQueue } from './output.queue'
     BullModule.registerQueue({
       name: OUTPUT_QUEUE_NAME,
     }),
-    UserBalanceModule,
+    UserSubscriptionModule,
   ],
   providers: [OutputQueue, R2Service, OutputQueueProcessor],
   exports: [OutputQueue],

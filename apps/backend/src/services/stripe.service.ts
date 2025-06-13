@@ -5,39 +5,40 @@ import * as stripe from 'stripe'
 @Injectable()
 export class StripeService {
   private client: stripe.Stripe
+  success_url: string
+  cancel_url: string
 
   constructor(private configService: ConfigService) {
-    const api_key = configService.get('stripe.api_key')
+    const secret_key = this.configService.get('stripe.secret_key')
 
-    this.client = new stripe.Stripe(api_key)
+    this.client = new stripe.Stripe(secret_key)
+
+    this.success_url = this.configService.get('stripe.success_url')
+    this.cancel_url = this.configService.get('stripe.cancel_url')
   }
 
-  async createPaymentLink(
-    price: string,
-    referral?: string,
-    metadata?: {
-      user: string
-      license: string
-    },
-  ): Promise<string> {
+  async create_checkout_session(
+    price_id: string,
+    metadata: Record<string, any>,
+  ) {
     const session = await this.client.checkout.sessions.create({
-      billing_address_collection: 'auto',
-      mode: 'setup',
-      success_url: this.configService.get('stripe.successUrl'),
-      cancel_url: this.configService.get('stripe.cancelUrl'),
-      subscription_data: {
-        metadata: {
-          tolt_referral: referral,
-          ...metadata,
+      mode: 'subscription',
+      line_items: [
+        {
+          price: price_id,
+          quantity: 1,
         },
-      },
+      ],
+      success_url: this.success_url,
+      cancel_url: this.cancel_url,
+      allow_promotion_codes: true,
       metadata,
     })
 
-    return session.url
+    return session
   }
 
-  verifyStripeWebhookSignature(
+  create_webhook_event(
     signature: string | string[],
     payload: any,
     secret: string,
@@ -47,38 +48,7 @@ export class StripeService {
       signature,
       secret,
     )
+
     return event
-  }
-
-  async createCreditLink(
-    price: string,
-    metadata?: {
-      user: string
-      team: string
-    },
-  ): Promise<string> {
-    const session = await this.client.checkout.sessions.create({
-      billing_address_collection: 'auto',
-      line_items: [
-        {
-          price,
-          adjustable_quantity: {
-            enabled: true,
-            minimum: 1,
-            maximum: 10,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: this.configService.get('stripe.successUrl'),
-      cancel_url: this.configService.get('stripe.cancelUrl'),
-      subscription_data: {
-        metadata,
-      },
-      metadata,
-    })
-
-    return session.url
   }
 }

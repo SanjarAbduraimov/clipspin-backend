@@ -23,8 +23,8 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {
     this.googleClient = new OAuth2Client(
-      this.configService.get<string>('GOOGLE_CLIENT_ID'),
-      this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+      this.configService.get<string>('google.client_id'),
+      this.configService.get<string>('google.client_secret'),
     )
   }
 
@@ -98,7 +98,7 @@ export class AuthService {
     try {
       const ticket = await this.googleClient.verifyIdToken({
         idToken: token,
-        audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+        audience: this.configService.get<string>('google.client_id'),
       })
 
       const payload = ticket.getPayload()

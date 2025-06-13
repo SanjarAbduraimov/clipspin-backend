@@ -4,8 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { MainQueueModule } from 'apps/queue/src/queus/main-queue/main-queue.module'
 
 import { Project, ProjectSchema } from '../../models/project.schema'
-import { CreditConfigModule } from '../credit-config/credit-config.module'
-import { UserBalanceModule } from '../user-balance/user-balance.module'
+import { SubscriptionPlanModule } from '../subscription-plans/subscription-plan.module'
+import { UserSubscriptionModule } from '../user-subscriptions/user-subscription.module'
 import { ProjectController } from './project.controller'
 import { ProjectService } from './project.service'
 
@@ -19,8 +19,8 @@ import { ProjectService } from './project.service'
       },
     ]),
     MainQueueModule,
-    CreditConfigModule,
-    UserBalanceModule,
+    SubscriptionPlanModule,
+    UserSubscriptionModule,
   ],
   controllers: [ProjectController],
   providers: [ProjectService],

@@ -136,7 +136,7 @@ export class Project {
   result?: ProjectResult
 
   @Prop()
-  credit_cost?: number
+  consumed_credits?: number
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project)

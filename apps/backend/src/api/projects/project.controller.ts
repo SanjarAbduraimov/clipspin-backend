@@ -10,7 +10,6 @@ import { AllowedRoles } from '../../common/decarators/role.decarator'
 import { UserRole } from '../../common/enums/role.enum'
 import { NotFoundError } from '../../common/errors/not-fount.error'
 import { ProjectStatus, ProjectType } from '../../models/project.schema'
-import { UserBalanceService } from '../user-balance/user-balance.service'
 import { CreateProjectDTO } from './dto/create.dto'
 import { ProjectResponseDTO } from './dto/response.dto'
 import { ProjectResultDTO } from './dto/result.dto'
@@ -25,7 +24,6 @@ export class ProjectController {
   constructor(
     private readonly project_service: ProjectService,
     private readonly queue: MainQueue,
-    private readonly user_balance_service: UserBalanceService,
   ) {}
 
   @Get('/')
@@ -75,16 +73,9 @@ export class ProjectController {
   @Post('/')
   @ResponseDTO(ProjectResponseDTO)
   async create(@Body() body: CreateProjectDTO, @GetContext() ctx: Context) {
-    const credit_cost =
-      await this.user_balance_service.ensureUserHasEnoughCredits(
-        ctx.user._id,
-        body.type,
-      )
-
     const project = await this.project_service.create({
       ...body,
       user: ctx.user?._id,
-      credit_cost: credit_cost,
     })
 
     this.queue.analyze({ project_id: project._id })
