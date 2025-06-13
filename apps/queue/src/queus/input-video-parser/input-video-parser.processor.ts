@@ -5,6 +5,7 @@ import { Job } from 'bull'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
+  ProjectInput,
   ProjectInputSource,
   ProjectProgress,
   ProjectStatus,
@@ -20,11 +21,6 @@ import {
   INPUT_VIDEO_PARSER_QUEUE_EVENTS,
   INPUT_VIDEO_PARSER_QUEUE_NAME,
 } from './input-video-parser.queue'
-
-interface InputDownloadURLResponse {
-  url: string
-  source: ProjectInputSource
-}
 
 @Processor(INPUT_VIDEO_PARSER_QUEUE_NAME)
 export class InputVideoParserQueueProcessor {
@@ -51,7 +47,7 @@ export class InputVideoParserQueueProcessor {
     )
   }
 
-  async get_instagram_video(url: string): Promise<InputDownloadURLResponse> {
+  async get_instagram_video(url: string): Promise<ProjectInput> {
     const input = {
       directUrls: [url],
       resultsType: 'posts',
@@ -78,7 +74,7 @@ export class InputVideoParserQueueProcessor {
     }
   }
 
-  async get_tiktok_video(url: string): Promise<InputDownloadURLResponse> {
+  async get_tiktok_video(url: string): Promise<ProjectInput> {
     const input = {
       startUrls: [url],
       dateRange: 'DEFAULT',
@@ -103,30 +99,9 @@ export class InputVideoParserQueueProcessor {
     }
   }
 
-  async get_youtube_video(url: string): Promise<InputDownloadURLResponse> {
-    const input = {
-      startUrls: [url],
-      proxy: {
-        useApifyProxy: true,
-      },
-    }
-
-    const run = await this.client
-      .actor('epctex/youtube-video-downloader')
-      .call(input)
-
-    const { items } = await this.client
-      .dataset(run.defaultDatasetId)
-      .listItems()
-
-    const video_url = items[0]?.downloadUrl
-
-    if (!video_url) {
-      throw new Error('Video URL not found in the dataset items')
-    }
-
+  async get_youtube_video(url: string): Promise<ProjectInput> {
     return {
-      url: video_url as string,
+      url,
       source: ProjectInputSource.YOUTUBE,
     }
   }
@@ -196,20 +171,37 @@ export class InputVideoParserQueueProcessor {
       })
 
       const { url: video_url, source } = await this.get_download_url(
-        project.input_video_url,
+        project.input.url,
       )
 
-      const video_buffer = await this.download_video(video_url)
+      if (source == ProjectInputSource.YOUTUBE) {
+        await this.project_service.update(project._id, {
+          progress: ProjectProgress.INPUT_FETCHED,
+          input: {
+            ...project.input,
+            source,
+          },
+        })
 
-      const path = await this.save_video(video_buffer)
+        this.analyze_video_queue.analyze_youtube_video({
+          project_id: project._id,
+        })
+      } else {
+        const video_buffer = await this.download_video(video_url)
 
-      await this.project_service.update(project._id, {
-        file_key: path,
-        progress: ProjectProgress.INPUT_FETCHED,
-        input_video_source: source,
-      })
+        const file_key = await this.save_video(video_buffer)
 
-      this.analyze_video_queue.upload_video({ project_id: project._id })
+        await this.project_service.update(project._id, {
+          progress: ProjectProgress.INPUT_FETCHED,
+          input: {
+            ...project.input,
+            source,
+            file_key,
+          },
+        })
+
+        this.analyze_video_queue.upload_video({ project_id: project._id })
+      }
     } catch (error) {
       console.log(error)
 

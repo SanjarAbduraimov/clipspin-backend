@@ -46,7 +46,7 @@ export class AnalyzeVideoQueueProcessor {
         progress: ProjectProgress.ANALYZING_INPUT,
       })
 
-      const file = await this.r2_service.get_file(project.file_key)
+      const file = await this.r2_service.get_file(project.input.file_key)
 
       const buffer = await this.r2_service.stream_to_buffer(
         file.Body as Readable,
@@ -79,7 +79,29 @@ export class AnalyzeVideoQueueProcessor {
       const analysis = await this.genai_service.analyze_video(file_context)
 
       await this.project_service.update(project.id, {
-        input_summary: analysis.text,
+        suggested_ideas: analysis,
+        progress: ProjectProgress.INPUT_ANALYZED,
+      })
+    } catch (error) {
+      console.log(error)
+
+      await this.project_service.update(job.data.project_id, {
+        status: ProjectStatus.FAILED,
+      })
+    }
+  }
+
+  @Process(ANALYZE_VIDEO_QUEUE_EVENTS.ANALYZE_YOUTUBE_VIDEO)
+  async analyze_youtube(job: Job<AnalyzeVideoData>) {
+    try {
+      const project = await this.project_service.retrieve(job.data.project_id)
+
+      const analysis = await this.genai_service.analyze_youtube_video(
+        project.input.url,
+      )
+
+      await this.project_service.update(project.id, {
+        suggested_ideas: analysis,
         progress: ProjectProgress.INPUT_ANALYZED,
       })
     } catch (error) {

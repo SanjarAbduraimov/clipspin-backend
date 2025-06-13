@@ -12,7 +12,7 @@ import { NotFoundError } from '../../common/errors/not-fount.error'
 import { ProjectStatus, ProjectType } from '../../models/project.schema'
 import { CreateProjectDTO } from './dto/create.dto'
 import { ProjectResponseDTO } from './dto/response.dto'
-import { ProjectResultDTO } from './dto/result.dto'
+import { ProjectOutputDTO } from './dto/result.dto'
 import { UpdateProjectDTO } from './dto/update.dto'
 import { ProjectService } from './project.service'
 
@@ -105,7 +105,7 @@ export class ProjectController {
   async submit_result(
     @GetContext() ctx: Context,
     @Param('id') id: string,
-    @Body() body: ProjectResultDTO,
+    @Body() body: ProjectOutputDTO,
   ) {
     let project = await this.project_service.find({ _id: id }, ctx)
 
@@ -117,7 +117,7 @@ export class ProjectController {
 
     project = await this.project_service.update(
       id,
-      { result: body, status: ProjectStatus.COMPLETED },
+      { output: body, status: ProjectStatus.COMPLETED },
       ctx,
     )
 

@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer'
 import { IsOptional, IsString } from 'class-validator'
 
-export class ProjectResultDTO {
+export class ProjectOutputDTO {
   @Expose()
   @IsString()
   @IsOptional()

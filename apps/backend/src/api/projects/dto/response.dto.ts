@@ -2,7 +2,23 @@ import { Expose, Transform, Type } from 'class-transformer'
 
 import { transform_object_id } from 'apps/backend/src/common/utils/transform-object-id'
 
-import { ProjectResultDTO } from './result.dto'
+import { ProjectOutputDTO } from './result.dto'
+
+export class ProjectInputDTO {
+  @Expose()
+  url: string
+
+  @Expose()
+  source?: string
+
+  @Expose()
+  file_key?: string
+}
+
+export class ProjectIdeaDTO {
+  @Expose()
+  script?: string
+}
 
 export class ProjectResponseDTO {
   @Expose()
@@ -16,13 +32,16 @@ export class ProjectResponseDTO {
   type: string
 
   @Expose()
-  input_video_url: string
+  @Type(() => ProjectInputDTO)
+  input: ProjectInputDTO
 
   @Expose()
-  file_key: string
+  @Type(() => ProjectIdeaDTO)
+  suggested_ideas: ProjectIdeaDTO
 
   @Expose()
-  input_summary: string
+  @Type(() => ProjectIdeaDTO)
+  selected_idea: ProjectIdeaDTO
 
   @Expose()
   status: string
@@ -31,6 +50,6 @@ export class ProjectResponseDTO {
   progress: string
 
   @Expose()
-  @Type(() => ProjectResultDTO)
-  result: ProjectResultDTO
+  @Type(() => ProjectOutputDTO)
+  output: ProjectOutputDTO
 }
