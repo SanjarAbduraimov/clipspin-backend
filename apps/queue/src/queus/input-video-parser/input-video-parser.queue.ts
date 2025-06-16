@@ -3,9 +3,9 @@ import { Injectable } from '@nestjs/common'
 import { Queue } from 'bull'
 import { Types } from 'mongoose'
 
-export const INSTAGRAM_PARSER_QUEUE_NAME = 'instagram-parser-queue'
+export const INPUT_VIDEO_PARSER_QUEUE_NAME = 'input-video-parser-queue'
 
-export enum INSTAGRAM_PARSER_QUEUE_EVENTS {
+export enum INPUT_VIDEO_PARSER_QUEUE_EVENTS {
   DOWNLOAD_VIDEO = 'download_video',
 }
 
@@ -14,10 +14,12 @@ export interface DownloadVideoData {
 }
 
 @Injectable()
-export class InstagramParserQueue {
-  constructor(@InjectQueue(INSTAGRAM_PARSER_QUEUE_NAME) private queue: Queue) {}
+export class InputVideoParserQueue {
+  constructor(
+    @InjectQueue(INPUT_VIDEO_PARSER_QUEUE_NAME) private queue: Queue,
+  ) {}
 
   download_video(data: DownloadVideoData) {
-    this.queue.add(INSTAGRAM_PARSER_QUEUE_EVENTS.DOWNLOAD_VIDEO, data)
+    this.queue.add(INPUT_VIDEO_PARSER_QUEUE_EVENTS.DOWNLOAD_VIDEO, data)
   }
 }

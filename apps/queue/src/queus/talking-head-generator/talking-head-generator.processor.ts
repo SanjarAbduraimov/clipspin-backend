@@ -55,11 +55,11 @@ export class TalkingHeadGeneratorQueueProcessor {
       })
 
       const script = await this.openai_service.generate_talking_head_script({
-        description: project.input_summary,
+        description: project.selected_idea.script,
       })
 
       await this.project_service.update(project.id, {
-        talking_head_script: script,
+        talking_head_data: script,
       })
 
       this.talking_head_generator_queue.generate_video({
@@ -80,18 +80,18 @@ export class TalkingHeadGeneratorQueueProcessor {
       })
 
       const video = await this.heygen_service.generate_video({
-        script: project.talking_head_script.script,
-        title: project.talking_head_script.title,
+        script: project.talking_head_data.script,
+        title: project.talking_head_data.title,
         callback_id: project._id.toString(),
       })
 
       await this.project_service.update(job.data.project_id, {
-        result: {
+        output: {
           video_id: video.data.video_id,
         },
       })
     } catch (error) {
-      console.log(error)
+      console.log(error?.response?.data || error?.message)
 
       await this.project_service.update(job.data.project_id, {
         status: ProjectStatus.FAILED,

@@ -8,7 +8,7 @@ import {
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
-import { InstagramParserQueue } from '../instagram-parser/instagram-parser.queue'
+import { InputVideoParserQueue } from '../input-video-parser/input-video-parser.queue'
 import { OutputQueue, OutputQueueData } from '../output/output.queue'
 import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
 import { TalkingHeadGeneratorQueue } from '../talking-head-generator/talking-head-generator.queue'
@@ -22,7 +22,7 @@ import {
 @Processor(MAIN_QUEUE_NAME)
 export class MainQueueProcessor {
   constructor(
-    private readonly instagram_parser_queue: InstagramParserQueue,
+    private readonly input_video_parser_queue: InputVideoParserQueue,
     private readonly slide_generator_queue: SlideGeneratorQueue,
     private readonly project_service: ProjectService,
     private readonly text_audiogram_generator_queue: TextAudiogramGeneratorQueue,
@@ -41,7 +41,7 @@ export class MainQueueProcessor {
 
   @Process(MAIN_QUEUE_EVENTS.PROCESS)
   async analyze(job: Job<MainQueueData>) {
-    this.instagram_parser_queue.download_video({
+    this.input_video_parser_queue.download_video({
       project_id: job.data.project_id,
     })
   }

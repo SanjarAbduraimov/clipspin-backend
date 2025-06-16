@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Client } from 'creatomate'
 
-import { Scene, Script } from 'apps/backend/src/models/project.schema'
+import {
+  SlideShowScene,
+  TextAudiogramData,
+} from 'apps/backend/src/models/project.schema'
 
 @Injectable()
 export class CreatomateService {
@@ -22,7 +25,7 @@ export class CreatomateService {
     this.client = new Client(api_key)
   }
 
-  async generate_slide_show({ scenes }: { scenes: Scene[] }) {
+  async generate_slide_show({ scenes }: { scenes: SlideShowScene[] }) {
     const response = await this.client.render({
       templateId: this.slide_show_template_id,
       modifications: {
@@ -57,7 +60,7 @@ export class CreatomateService {
     return response[0].url
   }
 
-  async generate_text_audiogram({ script }: { script: Script }) {
+  async generate_text_audiogram({ script }: { script: TextAudiogramData }) {
     const response = await this.client.render({
       templateId: this.text_audiogram_template_id,
       modifications: {

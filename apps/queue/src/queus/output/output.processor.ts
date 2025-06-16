@@ -70,12 +70,12 @@ export class OutputQueueProcessor {
 
       const path = await this.save_video(video_buffer)
 
-      const result = project.result || {}
+      const result = project.output || {}
 
       result.file_key = path
 
       await this.project_service.update(project._id, {
-        result,
+        output: result,
         progress: ProjectProgress.RESULTS_SAVED,
         status: ProjectStatus.COMPLETED,
       })

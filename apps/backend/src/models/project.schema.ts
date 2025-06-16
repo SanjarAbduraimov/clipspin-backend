@@ -12,6 +12,12 @@ export enum ProjectType {
   PROFESSIONAL = 'professional',
 }
 
+export enum ProjectInputSource {
+  YOUTUBE = 'youtube',
+  INSTAGRAM = 'instagram',
+  TIKTOK = 'tiktok',
+}
+
 export enum ProjectStatus {
   QUEUED = 'queued',
   IN_PROGRESS = 'in_progress',
@@ -40,7 +46,7 @@ export enum ProjectProgress {
   RESULTS_SAVED = 'results_saved',
 }
 
-export class Scene {
+export class SlideShowScene {
   @Prop()
   scene_number?: number
 
@@ -54,7 +60,12 @@ export class Scene {
   image_url?: string
 }
 
-export class Script {
+export class SlideShowData {
+  @Prop({ type: [SlideShowScene] })
+  scenes?: SlideShowScene[]
+}
+
+export class TextAudiogramData {
   @Prop()
   quote_text?: string
 
@@ -68,7 +79,7 @@ export class Script {
   image_url?: string
 }
 
-export class TalkingHeadScript {
+export class TalkingHeadData {
   @Prop()
   title?: string
 
@@ -76,12 +87,31 @@ export class TalkingHeadScript {
   script?: string
 }
 
-export class ProjectResult {
+export class ProjectOutput {
   @Prop()
   file_key?: string
 
   @Prop()
   video_id?: string
+}
+
+export class ProjectInput {
+  @Prop()
+  url: string
+
+  @Prop({
+    type: String,
+    enum: ProjectInputSource,
+  })
+  source?: ProjectInputSource
+
+  @Prop()
+  file_key?: string
+}
+
+export class ProjectIdea {
+  @Prop()
+  script?: string
 }
 
 @Schema({
@@ -98,23 +128,23 @@ export class Project {
   @Prop()
   title: string
 
-  @Prop()
-  input_video_url: string
+  @Prop({ type: ProjectInput })
+  input: ProjectInput
 
-  @Prop()
-  file_key?: string
+  @Prop({ type: [ProjectIdea] })
+  suggested_ideas?: ProjectIdea[]
 
-  @Prop()
-  input_summary?: string
+  @Prop({ type: ProjectIdea })
+  selected_idea?: ProjectIdea
 
-  @Prop({ type: [Scene] })
-  scenes?: Scene[]
+  @Prop({ type: SlideShowData })
+  slide_show_data?: SlideShowData
 
-  @Prop({ type: Script })
-  script?: Script
+  @Prop({ type: TextAudiogramData })
+  text_audiogram_data?: TextAudiogramData
 
-  @Prop({ type: TalkingHeadScript })
-  talking_head_script?: TalkingHeadScript
+  @Prop({ type: TalkingHeadData })
+  talking_head_data?: TalkingHeadData
 
   @Prop({ type: Types.ObjectId, ref: 'users' })
   user: Types.ObjectId
@@ -132,11 +162,11 @@ export class Project {
   })
   progress?: ProjectProgress
 
-  @Prop({ type: Scene })
-  result?: ProjectResult
-
   @Prop()
   consumed_credits?: number
+
+  @Prop({ type: SlideShowScene })
+  output?: ProjectOutput
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project)
