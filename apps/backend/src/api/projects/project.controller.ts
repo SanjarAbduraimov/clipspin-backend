@@ -82,56 +82,56 @@ export class ProjectController {
     @GetContext() ctx: Context,
     @User() user: UserDocument,
   ) {
-    const user_subscription = await this.user_subscription_service.find({
-      user: user._id,
-    })
+    // const user_subscription = await this.user_subscription_service.find({
+    //   user: user._id,
+    // })
 
-    if (!user_subscription) {
-      throw new NotFoundError(UserSubscriptionController.resource_name, {
-        user: user._id,
-      })
-    }
+    // if (!user_subscription) {
+    //   throw new NotFoundError(UserSubscriptionController.resource_name, {
+    //     user: user._id,
+    //   })
+    // }
 
-    const subscription_plan = await this.subscription_plan_service.retrieve(
-      user_subscription.subscription_plan,
-    )
+    // const subscription_plan = await this.subscription_plan_service.retrieve(
+    //   user_subscription.subscription_plan,
+    // )
 
-    if (!subscription_plan) {
-      throw new NotFoundError(SubscriptionPlanController.resource_name, {
-        id: user_subscription.subscription_plan,
-      })
-    }
+    // if (!subscription_plan) {
+    //   throw new NotFoundError(SubscriptionPlanController.resource_name, {
+    //     id: user_subscription.subscription_plan,
+    //   })
+    // }
 
-    const project_cost = subscription_plan.project_type_prices.find(
-      (item) => item.project_type == body.type,
-    )
+    // const project_cost = subscription_plan.project_type_prices.find(
+    //   (item) => item.project_type == body.type,
+    // )
 
-    const credit_cost = project_cost.credit_cost
-    const remaining_monthly_credits =
-      user_subscription.monthly_credits.remaining
-    const remaining_purchased_credits =
-      user_subscription.purchased_credits.remaining
+    // const credit_cost = project_cost.credit_cost
+    // const remaining_monthly_credits =
+    //   user_subscription.monthly_credits.remaining
+    // const remaining_purchased_credits =
+    //   user_subscription.purchased_credits.remaining
 
-    const monthly_used = Math.min(remaining_monthly_credits, credit_cost)
-    const remaining = credit_cost - monthly_used
-    const purchased_used = Math.min(remaining_purchased_credits, remaining)
+    // const monthly_used = Math.min(remaining_monthly_credits, credit_cost)
+    // const remaining = credit_cost - monthly_used
+    // const purchased_used = Math.min(remaining_purchased_credits, remaining)
 
-    const total_used = monthly_used + purchased_used
+    // const total_used = monthly_used + purchased_used
 
-    if (total_used < credit_cost) {
-      throw new Error('Not enough total credits to cover the amount')
-    }
+    // if (total_used < credit_cost) {
+    //   throw new Error('Not enough total credits to cover the amount')
+    // }
 
-    const credit_usage = {
-      total: total_used,
-      monthly: monthly_used,
-      purchased: purchased_used,
-    }
+    // const credit_usage = {
+    //   total: total_used,
+    //   monthly: monthly_used,
+    //   purchased: purchased_used,
+    // }
 
-    await this.user_subscription_service.decrement_credits(
-      user_subscription._id,
-      credit_usage,
-    )
+    // await this.user_subscription_service.decrement_credits(
+    //   user_subscription._id,
+    //   credit_usage,
+    // )
 
     const project = await this.project_service.create({
       ...body,
