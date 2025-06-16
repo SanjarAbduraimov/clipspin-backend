@@ -136,7 +136,7 @@ export class ProjectController {
     const project = await this.project_service.create({
       ...body,
       user: ctx.user?._id,
-      credit_usage,
+      credit_usage: 0,
     })
 
     this.queue.analyze({ project_id: project._id })
