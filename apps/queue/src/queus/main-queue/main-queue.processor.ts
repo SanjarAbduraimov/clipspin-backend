@@ -1,10 +1,7 @@
 import { OnQueueActive, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 
-import {
-  ProjectStatus,
-  ProjectType,
-} from 'apps/backend/src/models/project.schema'
+import { ProjectType } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
@@ -76,9 +73,7 @@ export class MainQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 

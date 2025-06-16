@@ -10,6 +10,8 @@ import { AuthModule } from './api/auth/auth.module'
 import { FileModule } from './api/files/file.module'
 import { ProfileModule } from './api/profile/profile.module'
 import { ProjectModule } from './api/projects/project.module'
+import { SubscriptionPlanModule } from './api/subscription-plans/subscription-plan.module'
+import { UserSubscriptionModule } from './api/user-subscriptions/user-subscription.module'
 import configuration from './config'
 
 @Module({
@@ -49,6 +51,8 @@ import configuration from './config'
     ProfileModule,
     ProjectModule,
     FileModule,
+    SubscriptionPlanModule,
+    UserSubscriptionModule,
   ],
   controllers: [],
   providers: [

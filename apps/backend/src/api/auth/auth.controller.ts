@@ -13,7 +13,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiTags } from '@nestjs/swagger'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 
 import { Public } from '../../common/decarators/public.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
@@ -24,9 +24,11 @@ import { GoogleAuthDTO, GoogleAuthResponseDTO } from './dto/google-auth.dto'
 import { OTPResponseDTO, SendOTPPhoneEmailDTO } from './dto/otp.dto'
 import { SignInDTO, SignInResponseDTO } from './dto/singin.dto'
 
-@ApiTags('Auth')
+@ApiTags(AuthController.resource_name)
 @Controller('/api/auth')
 export class AuthController {
+  static resource_name = 'auth'
+
   constructor(
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
@@ -67,7 +69,7 @@ export class AuthController {
       throw new NotFoundException(ErrorMessage.INVALID_OTP_CODE)
     }
 
-    const access_token = await this.authService.signIn({
+    const { access_token } = await this.authService.signIn({
       email,
     })
 
@@ -101,20 +103,12 @@ export class AuthController {
   @Public()
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(
-    @Query('redirect_url') redirectUrl: string,
-    @Req() req,
-    @Res() res: Response,
-  ) {
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
     const { user } = req
-    console.log(
-      'redirect_url in /google/callback',
-      JSON.stringify(req.query),
-      redirectUrl,
-    )
-    const result = await this.authService.googleSignIn(user)
 
-    const frontend_url = this.configService.get<string>('FRONTEND_URL')
+    const result = await this.authService.googleSignIn(user as any)
+
+    const frontend_url = this.configService.get<string>('frontend_url')
 
     return res.redirect(
       `${frontend_url}/auth/google/callback?token=${result.access_token}`,

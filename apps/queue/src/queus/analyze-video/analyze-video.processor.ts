@@ -2,10 +2,7 @@ import { OnQueueActive, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 import { Readable } from 'stream'
 
-import {
-  ProjectProgress,
-  ProjectStatus,
-} from 'apps/backend/src/models/project.schema'
+import { ProjectProgress } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
@@ -61,9 +58,7 @@ export class AnalyzeVideoQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 
@@ -85,9 +80,7 @@ export class AnalyzeVideoQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 
@@ -107,9 +100,7 @@ export class AnalyzeVideoQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 }

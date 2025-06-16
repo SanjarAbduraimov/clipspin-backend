@@ -3,10 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { ApifyClient } from 'apify-client'
 import { Job } from 'bull'
 
-import {
-  ProjectProgress,
-  ProjectStatus,
-} from 'apps/backend/src/models/project.schema'
+import { ProjectProgress } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
@@ -100,9 +97,7 @@ export class TextAudiogramGeneratorQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 
@@ -123,9 +118,7 @@ export class TextAudiogramGeneratorQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 }
