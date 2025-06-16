@@ -1,12 +1,27 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  RawBodyRequest,
+  Req,
+} from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { Request } from 'express'
 
 import { Context, GetContext } from '../../common/decarators/context.decarator'
+import { Public } from '../../common/decarators/public.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
 import { AllowedRoles } from '../../common/decarators/role.decarator'
 import { UserRole } from '../../common/enums/role.enum'
+import { BadRequestError } from '../../common/errors/bad-request.error'
 import { NotFoundError } from '../../common/errors/not-fount.error'
 import { StripeService } from '../../services/stripe.service'
+import { ProfileService } from '../profile/profile.service'
+import { UserSubscriptionService } from '../user-subscriptions/user-subscription.service'
 import { CreateSubscriptionPlanDTO } from './dto/create.dto'
 import { SubscriptionPlanResponseDTO } from './dto/response.dto'
 import { UpdateSubscriptionPlanDTO } from './dto/update.dto'
@@ -20,7 +35,9 @@ export class SubscriptionPlanController {
 
   constructor(
     private readonly subscription_plan_service: SubscriptionPlanService,
+    private readonly user_subscription_service: UserSubscriptionService,
     private readonly stripe_service: StripeService,
+    private readonly profile_service: ProfileService,
   ) {}
 
   @Get('/')
@@ -65,14 +82,26 @@ export class SubscriptionPlanController {
       })
     }
 
+    const user_subscription = await this.user_subscription_service.find({
+      user: ctx.user._id,
+      subscription_plan: subscription_plan._id,
+    })
+
+    if (user_subscription) {
+      throw new BadRequestError(SubscriptionPlanController.resource_name, {
+        id: id,
+      })
+    }
+
     const session = await this.stripe_service.create_checkout_session(
       subscription_plan.stripe_price_id,
-      { user_id: ctx.user._id },
+      {
+        user_id: ctx.user._id.toString(),
+        subscription_plan_id: subscription_plan._id.toString(),
+      },
     )
 
-    console.log(session)
-
-    return { data: subscription_plan }
+    return { data: session.url }
   }
 
   @Post('/')
@@ -129,5 +158,34 @@ export class SubscriptionPlanController {
     await this.subscription_plan_service.delete(id)
 
     return { data: null }
+  }
+
+  @Public()
+  @Post('/webhook')
+  async webhook(@Req() req: RawBodyRequest<Request>) {
+    const stripe_signature = req.headers['stripe-signature']
+
+    const event = this.stripe_service.create_webhook_event(
+      stripe_signature,
+      req.rawBody,
+    )
+
+    if (event.type == 'checkout.session.completed') {
+      const data = event.data.object
+
+      if (data.payment_status == 'paid') {
+        const { user_id, subscription_plan_id } = data.metadata
+
+        const user = await this.profile_service.retrieve(user_id)
+
+        await this.user_subscription_service.create_subscription(
+          user,
+          subscription_plan_id,
+          {
+            expires_at: new Date(),
+          },
+        )
+      }
+    }
   }
 }

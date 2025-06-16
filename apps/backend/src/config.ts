@@ -28,6 +28,9 @@ export const validation_schema = Joi.object({
   R2_ENDPOINT: Joi.string().required(),
   R2_BUCKET_NAME: Joi.string().required(),
   STRIPE_SECRET_KEY: Joi.string().required(),
+  STRIPE_SUCCESS_URL: Joi.string().required(),
+  STRIPE_CANCEL_URL: Joi.string().required(),
+  STRIPE_WEBHOOK_SECRET: Joi.string().required(),
 })
 
 export const configuration = () => ({
@@ -79,6 +82,9 @@ export const configuration = () => ({
   },
   stripe: {
     secret_key: process.env.STRIPE_SECRET_KEY,
+    success_url: process.env.STRIPE_SUCCESS_URL,
+    cancel_url: process.env.STRIPE_CANCEL_URL,
+    webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
   },
 })
 

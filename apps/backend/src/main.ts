@@ -9,6 +9,7 @@ import { TransformResponseInterceptor } from './common/interceptors/response.int
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
+    rawBody: true,
     cors: true,
     logger: ['error', 'warn', 'log'],
   })

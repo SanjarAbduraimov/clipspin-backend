@@ -20,7 +20,7 @@ export class ProjectTypePrice {
 })
 export class SubscriptionPlan {
   @Prop()
-  name: number
+  name: string
 
   @Prop()
   description?: string

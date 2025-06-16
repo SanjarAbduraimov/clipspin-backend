@@ -82,9 +82,7 @@ export class OutputQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 }

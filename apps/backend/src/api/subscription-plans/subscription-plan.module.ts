@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 
 import {
@@ -6,6 +6,8 @@ import {
   SubscriptionPlanSchema,
 } from '../../models/subscription-plan.schema'
 import { StripeService } from '../../services/stripe.service'
+import { ProfileModule } from '../profile/profile.module'
+import { UserSubscriptionModule } from '../user-subscriptions/user-subscription.module'
 import { SubscriptionPlanController } from './subscription-plan.controller'
 import { SubscriptionPlanService } from './subscription-plan.service'
 
@@ -17,6 +19,8 @@ import { SubscriptionPlanService } from './subscription-plan.service'
         schema: SubscriptionPlanSchema,
       },
     ]),
+    forwardRef(() => UserSubscriptionModule),
+    forwardRef(() => ProfileModule),
   ],
   controllers: [SubscriptionPlanController],
   providers: [StripeService, SubscriptionPlanService],

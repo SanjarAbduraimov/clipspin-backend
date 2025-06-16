@@ -7,6 +7,7 @@ export class StripeService {
   private client: stripe.Stripe
   success_url: string
   cancel_url: string
+  webhook_secret: string
 
   constructor(private configService: ConfigService) {
     const secret_key = this.configService.get('stripe.secret_key')
@@ -15,6 +16,7 @@ export class StripeService {
 
     this.success_url = this.configService.get('stripe.success_url')
     this.cancel_url = this.configService.get('stripe.cancel_url')
+    this.webhook_secret = this.configService.get('stripe.webhook_secret')
   }
 
   async create_checkout_session(
@@ -38,15 +40,11 @@ export class StripeService {
     return session
   }
 
-  create_webhook_event(
-    signature: string | string[],
-    payload: any,
-    secret: string,
-  ) {
+  create_webhook_event(signature: string | string[], body: any) {
     const event = this.client.webhooks.constructEvent(
-      payload,
+      body,
       signature,
-      secret,
+      this.webhook_secret,
     )
 
     return event
