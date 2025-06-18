@@ -20,7 +20,6 @@ export class HeygenService {
   }
 
   async generate_video({
-    title,
     script,
     callback_id,
   }: {
@@ -28,40 +27,33 @@ export class HeygenService {
     script: string
     callback_id: string
   }): Promise<any> {
-    const response = await this.client.post('/v2/video/generate', {
-      title,
-      caption: false,
-      video_inputs: [
-        {
-          character: {
-            type: 'avatar',
-            avatar_id: 'Georgia_expressive_2024112701',
-            avatar_style: 'normal',
-          },
-          voice: {
+    console.log(this.callback_url)
+
+    const response = await this.client.post(
+      `/v2/template/23309bc49e3c4f9da72f34aab6b6108b/generate`,
+      {
+        caption: false,
+        title: 'TEST API',
+        variables: {
+          script_en: {
+            name: 'script_en',
             type: 'text',
-            input_text: script,
-            voice_id: '511ffd086a904ef593b608032004112c',
-            speed: 1,
-          },
-          background: {
-            type: 'image',
-            url: 'https://livestorm.imgix.net/1127/1642785626-office_003.jpg',
-            fit: 'crop',
+            properties: {
+              content: script,
+            },
           },
         },
-      ],
-      dimension: {
-        width: 720,
-        height: 1280,
+        dimension: {
+          width: 720,
+          height: 1280,
+        },
+        option: {
+          remove_logo: true,
+        },
+        callback_url: this.callback_url,
+        callback_id,
       },
-
-      option: {
-        remove_logo: true,
-      },
-      callback_url: this.callback_url,
-      callback_id,
-    })
+    )
 
     return response.data
   }
