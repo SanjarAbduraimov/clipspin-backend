@@ -12,9 +12,7 @@ import { UserRole } from '../../common/enums/role.enum'
 import { NotFoundError } from '../../common/errors/not-fount.error'
 import { ProjectStatus, ProjectType } from '../../models/project.schema'
 import { UserDocument } from '../../models/user.schema'
-import { SubscriptionPlanController } from '../subscription-plans/subscription-plan.controller'
 import { SubscriptionPlanService } from '../subscription-plans/subscription-plan.service'
-import { UserSubscriptionController } from '../user-subscriptions/user-subscription.controller'
 import { UserSubscriptionService } from '../user-subscriptions/user-subscription.service'
 import { CreateProjectDTO } from './dto/create.dto'
 import { ProjectResponseDTO } from './dto/response.dto'
@@ -132,6 +130,8 @@ export class ProjectController {
     //   user_subscription._id,
     //   credit_usage,
     // )
+
+    user
 
     const project = await this.project_service.create({
       ...body,

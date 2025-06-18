@@ -23,6 +23,7 @@ import { StripeService } from '../../services/stripe.service'
 import { ProfileService } from '../profile/profile.service'
 import { UserSubscriptionService } from '../user-subscriptions/user-subscription.service'
 import { CreateSubscriptionPlanDTO } from './dto/create.dto'
+import { PurchaseCreditDTO } from './dto/credit.dto'
 import { SubscriptionPlanResponseDTO } from './dto/response.dto'
 import { UpdateSubscriptionPlanDTO } from './dto/update.dto'
 import { SubscriptionPlanService } from './subscription-plan.service'
@@ -93,11 +94,28 @@ export class SubscriptionPlanController {
       })
     }
 
-    const session = await this.stripe_service.create_checkout_session(
+    const session = await this.stripe_service.create_subscription_session(
       subscription_plan.stripe_price_id,
       {
         user_id: ctx.user._id.toString(),
         subscription_plan_id: subscription_plan._id.toString(),
+      },
+    )
+
+    return { data: session.url }
+  }
+
+  @Post('/purchase-credits')
+  @ResponseDTO(SubscriptionPlanResponseDTO)
+  async create_credit_purchase_session(
+    @GetContext() ctx: Context,
+    @Body() body: PurchaseCreditDTO,
+  ) {
+    const session = await this.stripe_service.create_credit_purchase_session(
+      body.quantity,
+      {
+        user_id: ctx.user._id.toString(),
+        quantity: body.quantity,
       },
     )
 
@@ -173,7 +191,9 @@ export class SubscriptionPlanController {
     if (event.type == 'checkout.session.completed') {
       const data = event.data.object
 
-      if (data.payment_status == 'paid') {
+      if (data.payment_status != 'paid') return
+
+      if (data.mode == 'subscription') {
         const { user_id, subscription_plan_id } = data.metadata
 
         const user = await this.profile_service.retrieve(user_id)
@@ -184,6 +204,15 @@ export class SubscriptionPlanController {
           {
             expires_at: new Date(),
           },
+        )
+      } else if (data.mode == 'payment') {
+        const { user_id, quantity } = data.metadata
+
+        const user = await this.profile_service.retrieve(user_id)
+
+        await this.user_subscription_service.add_purchased_credits(
+          user._id,
+          +quantity,
         )
       }
     }

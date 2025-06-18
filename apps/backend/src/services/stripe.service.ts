@@ -9,17 +9,17 @@ export class StripeService {
   cancel_url: string
   webhook_secret: string
 
-  constructor(private configService: ConfigService) {
-    const secret_key = this.configService.get('stripe.secret_key')
+  constructor(private config_service: ConfigService) {
+    const secret_key = this.config_service.get('stripe.secret_key')
 
     this.client = new stripe.Stripe(secret_key)
 
-    this.success_url = this.configService.get('stripe.success_url')
-    this.cancel_url = this.configService.get('stripe.cancel_url')
-    this.webhook_secret = this.configService.get('stripe.webhook_secret')
+    this.success_url = this.config_service.get('stripe.success_url')
+    this.cancel_url = this.config_service.get('stripe.cancel_url')
+    this.webhook_secret = this.config_service.get('stripe.webhook_secret')
   }
 
-  async create_checkout_session(
+  async create_subscription_session(
     price_id: string,
     metadata: Record<string, any>,
   ) {
@@ -29,6 +29,29 @@ export class StripeService {
         {
           price: price_id,
           quantity: 1,
+        },
+      ],
+      success_url: this.success_url,
+      cancel_url: this.cancel_url,
+      allow_promotion_codes: true,
+      metadata,
+    })
+
+    return session
+  }
+
+  async create_credit_purchase_session(
+    quantity: number = 1,
+    metadata: Record<string, any>,
+  ) {
+    const credit_price_id = this.config_service.get('stripe.credit_price_id')
+
+    const session = await this.client.checkout.sessions.create({
+      mode: 'payment',
+      line_items: [
+        {
+          price: credit_price_id,
+          quantity,
         },
       ],
       success_url: this.success_url,

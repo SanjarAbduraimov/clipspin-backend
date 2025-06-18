@@ -81,6 +81,20 @@ export class UserSubscriptionService extends BaseService<UserSubscription> {
     return true
   }
 
+  async add_purchased_credits(user_id: Types.ObjectId, quantity: number) {
+    const user_subscription = await this.find({ user: user_id })
+
+    await this.user_subscription_model.findByIdAndUpdate(
+      user_subscription._id,
+      {
+        $inc: {
+          'purchased_credits.total': quantity,
+          'purchased_credits.remaining': quantity,
+        },
+      },
+    )
+  }
+
   async decrement_credits(
     user_subscription_id: Types.ObjectId,
     usage: CreditUsage,
@@ -93,7 +107,10 @@ export class UserSubscriptionService extends BaseService<UserSubscription> {
     })
   }
 
-  async increment_credits(user_id: Types.ObjectId, usage: CreditUsage) {
+  async increment_credits(
+    user_id: Types.ObjectId,
+    usage: Omit<CreditUsage, 'total'>,
+  ) {
     const user_subscription = await this.find({ user: user_id })
 
     await this.user_subscription_model.findByIdAndUpdate(
