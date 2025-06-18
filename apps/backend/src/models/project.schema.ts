@@ -114,6 +114,17 @@ export class ProjectIdea {
   script?: string
 }
 
+export class CreditUsage {
+  @Prop()
+  total: number
+
+  @Prop()
+  monthly: number
+
+  @Prop()
+  purchased: number
+}
+
 @Schema({
   timestamps: COLLECTION_TIMESTAMPS,
   collection: 'projects',
@@ -146,7 +157,7 @@ export class Project {
   @Prop({ type: TalkingHeadData })
   talking_head_data?: TalkingHeadData
 
-  @Prop({ type: Types.ObjectId, ref: 'users' })
+  @Prop({ type: Types.ObjectId, ref: 'User' })
   user: Types.ObjectId
 
   @Prop({
@@ -162,8 +173,12 @@ export class Project {
   })
   progress?: ProjectProgress
 
+  @Prop({ type: CreditUsage })
+  credit_usage?: CreditUsage
+
   @Prop({ type: SlideShowScene })
   output?: ProjectOutput
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project)
+ProjectSchema.index({ user: 1, status: 1 })

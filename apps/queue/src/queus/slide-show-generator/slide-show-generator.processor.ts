@@ -5,7 +5,6 @@ import { Job } from 'bull'
 
 import {
   ProjectProgress,
-  ProjectStatus,
   SlideShowScene,
 } from 'apps/backend/src/models/project.schema'
 
@@ -113,9 +112,7 @@ export class SlideGeneratorQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 
@@ -140,9 +137,7 @@ export class SlideGeneratorQueueProcessor {
     } catch (error) {
       console.log(error)
 
-      await this.project_service.update(job.data.project_id, {
-        status: ProjectStatus.FAILED,
-      })
+      this.project_service.failed(job.data.project_id)
     }
   }
 }
