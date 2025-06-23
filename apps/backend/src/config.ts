@@ -37,7 +37,7 @@ export const validation_schema = Joi.object({
 export const configuration = () => ({
   env: process.env.NODE_ENV,
   port: parseInt(process.env.PORT, 10),
-  frontend_url: parseInt(process.env.FRONTEND_URL, 10),
+  frontend_url: process.env.FRONTEND_URL,
   database: {
     uri: process.env.DATABASE_URI,
     user: process.env.DATABASE_USER,
