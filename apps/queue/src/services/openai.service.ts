@@ -89,11 +89,12 @@ export class OpenAIService {
 
 Whenever a user provides the core idea, theme, or brief scenario for a short video, you must generate a JSON object exactly structured as follows:
 
-speechText: (An original, engaging, narrative-style speech text carefully crafted by you, clearly and creatively aligned with the user's provided idea or theme. Your speech text should be introspective, emotionally engaging, thought-provoking, and approximately 250-300 words for 1 minute short videos. Maintain clarity of language and poetic storytelling quality that suits cinematic voiceover narration.)
+speechText: (An original, engaging, narrative-style speech text carefully crafted by you, clearly and creatively aligned with the user's provided idea or theme. Your speech text should be introspective, emotionally engaging, thought-provoking, and approximately 150-200 words for short videos. Maintain clarity of language and poetic storytelling quality that suits cinematic voiceover narration.)
 
 image_prompt: (A vivid, narrative-rich, and extremely detailed image prompt that closely complements and illustrates your generated speech text. Your description must comprehensively detail atmosphere, lighting conditions, distinct color palettes, textures, emotional tones, clear composition including foreground, midground, background details, setting specifics, and characters—mentioning their approximate age, gender, posture, facial expression, attire, and emotional state clearly. Your image prompt must be narrative-supportive and visually evocative, at least 400 characters in length. End every image prompt exactly with this sentence: Style: cinematic, high-detail, ultra-realistic, 8K, wide-angle.)
 
-CRITICAL INSTRUCTIONS:  
+CRITICAL INSTRUCTIONS:
+- quote_text MUST be 150-200 words
 - Only return the JSON object exactly as specified.  
 - Do NOT provide explanations, intros, apologies, comments, prefixes, or context outside the specified JSON structure.  
 - NEVER use double quotes (") in any part of your JSON output; only use single quotes (') if quotation or dialogue is necessary.  
@@ -105,7 +106,7 @@ EXAMPLE:
 [
   {
       "quote_text": "In the grand theater of life, success parades its gleaming trophies while failure lurks in shadowy corners. Yet, the heart's true victory lies not in the accolades nor the defeats, but in the sheer audacity to rise again. Each stumble carves wisdom into our souls, igniting our spirits to forge ahead. The courage to venture forth—this is the beacon guiding us through tempestuous seas. With every heartbeat, we write our own narrative—a saga of resilience, unyielding, echoing the timeless truth that it's the courage to continue that ultimately counts.",
-      "image_prompt": "A rugged path leads through a misty forest at dawn, where soft golden rays filter through dense, tall trees, illuminating the rich textures of moss-covered rocks and fallen leaves. In the foreground, a solitary figure—a young woman in her late twenties—stands with her back towards us, wearing a weathered brown jacket and sturdy hiking boots, gaze fixed on the distant horizon. Her posture signifies determination despite the challenges ahead, and a look of quiet resolve is captured in her stance. The midground reveals a winding trail that disappears into the thickness of the trees, while the background features silhouettes of mountains shrouded in early morning fog. The overall atmosphere is serene yet charged with the promise of adventure, inviting the viewer to contemplate their own journey. Style: cinematic, high-detail, ultra-realistic, 8K, wide-angle.",
+      "image_prompt": "A rugged path leads through a misty forest at dawn, where soft golden rays filter through dense, tall trees, illuminating the rich textures of moss-covered rocks and fallen leaves. In the foreground, a solitary figure—a young woman in her late twenties—stands with her back towards us, wearing a weathered brown jacket and sturdy hiking boots, gaze fixed on the distant horizon. Her posture signifies determination despite the challenges ahead, and a look of quiet resolve is captured in her stance. The midground reveals a winding trail that disappears into the thickness of the trees, while the background features silhouettes of mountains shrouded in early morning fog. The overall atmosphere is serene yet charged with the promise of adventure, inviting the viewer to contemplate their own journey. Style: cinematic, high-detail, ultra-realistic, 8K, wide-angle."
   }
 ]`,
         },
