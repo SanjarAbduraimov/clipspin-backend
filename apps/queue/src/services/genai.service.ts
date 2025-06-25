@@ -101,21 +101,35 @@ Avoid using emojis, video directions, or any kind of markup. Return only the raw
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              script: {
-                type: Type.STRING,
-              },
+          type: Type.OBJECT,
+          properties: {
+            remix_script: {
+              type: Type.STRING,
+              description:
+                'A remixed version of the script that keeps the same viral energy and tone. The script should be between 100 and 150 words',
+            },
+            negative_hook_script: {
+              type: Type.STRING,
+              description:
+                'A version of the script with a negative hook that builds curiosity or highlights a pain point. The script should be between 100 and 150 words',
+            },
+            hormozi_style_script: {
+              type: Type.STRING,
+              description:
+                'A version of the script written in the bold, direct, value-packed style of Alex Hormozi. The script should be between 100 and 150 words',
             },
           },
-          maxItems: 3,
-          minItems: 3,
+          required: [
+            'remix_script',
+            'negative_hook_script',
+            'hormozi_style_script',
+          ],
         },
       },
     })
 
-    return JSON.parse(response.text)
+    const analysis = JSON.parse(response.text)
+
+    return Object.values(analysis).map((value) => ({ script: value }))
   }
 }
