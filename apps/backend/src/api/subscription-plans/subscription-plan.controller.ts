@@ -23,7 +23,6 @@ import { StripeService } from '../../services/stripe.service'
 import { ProfileService } from '../profile/profile.service'
 import { UserSubscriptionService } from '../user-subscriptions/user-subscription.service'
 import { CreateSubscriptionPlanDTO } from './dto/create.dto'
-import { PurchaseCreditDTO } from './dto/credit.dto'
 import { SubscriptionPlanResponseDTO } from './dto/response.dto'
 import { UpdateSubscriptionPlanDTO } from './dto/update.dto'
 import { SubscriptionPlanService } from './subscription-plan.service'
@@ -105,23 +104,6 @@ export class SubscriptionPlanController {
     return { data: session.url }
   }
 
-  @Post('/purchase-credits')
-  @ResponseDTO(SubscriptionPlanResponseDTO)
-  async create_credit_purchase_session(
-    @GetContext() ctx: Context,
-    @Body() body: PurchaseCreditDTO,
-  ) {
-    const session = await this.stripe_service.create_credit_purchase_session(
-      body.quantity,
-      {
-        user_id: ctx.user._id.toString(),
-        quantity: body.quantity,
-      },
-    )
-
-    return { data: session.url }
-  }
-
   @Post('/')
   @AllowedRoles(UserRole.ADMIN)
   @ResponseDTO(SubscriptionPlanResponseDTO)
@@ -139,10 +121,7 @@ export class SubscriptionPlanController {
     @Param('id') id: string,
     @Body() body: UpdateSubscriptionPlanDTO,
   ) {
-    let subscription_plan = await this.subscription_plan_service.find(
-      { _id: id, user: ctx.user._id },
-      ctx,
-    )
+    let subscription_plan = await this.subscription_plan_service.retrieve(id)
 
     if (!subscription_plan) {
       throw new NotFoundError(SubscriptionPlanController.resource_name, {
@@ -161,11 +140,8 @@ export class SubscriptionPlanController {
 
   @Delete('/:id')
   @AllowedRoles(UserRole.ADMIN)
-  async delete(@Param('id') id: string, @GetContext() ctx: Context) {
-    const subscription_plan = await this.subscription_plan_service.find(
-      { _id: id, user: ctx.user._id },
-      ctx,
-    )
+  async delete(@Param('id') id: string) {
+    let subscription_plan = await this.subscription_plan_service.retrieve(id)
 
     if (!subscription_plan) {
       throw new NotFoundError(SubscriptionPlanController.resource_name, {
@@ -202,17 +178,17 @@ export class SubscriptionPlanController {
           user,
           subscription_plan_id,
           {
-            expires_at: new Date(),
+            expires_at: new Date(new Date().getTime() + 30 * 24 * 3600 * 1000),
           },
         )
       } else if (data.mode == 'payment') {
-        const { user_id, quantity } = data.metadata
+        const { user_id, credit_pack_id } = data.metadata
 
         const user = await this.profile_service.retrieve(user_id)
 
         await this.user_subscription_service.add_purchased_credits(
           user._id,
-          +quantity,
+          credit_pack_id,
         )
       }
     }

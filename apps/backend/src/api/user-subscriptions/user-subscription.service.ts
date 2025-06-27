@@ -6,6 +6,7 @@ import { BaseService } from '../../common/services/base.service'
 import { CreditUsage, ProjectType } from '../../models/project.schema'
 import { UserSubscription } from '../../models/user-subscription.schema'
 import { UserDocument } from '../../models/user.schema'
+import { CreditPackService } from '../credit-packs/credit-pack.service'
 import { SubscriptionPlanService } from '../subscription-plans/subscription-plan.service'
 
 @Injectable()
@@ -14,6 +15,7 @@ export class UserSubscriptionService extends BaseService<UserSubscription> {
     @InjectModel(UserSubscription.name)
     private readonly user_subscription_model: Model<UserSubscription>,
     private readonly subscription_plan_service: SubscriptionPlanService,
+    private readonly credit_pack_service: CreditPackService,
   ) {
     super(user_subscription_model)
   }
@@ -81,15 +83,17 @@ export class UserSubscriptionService extends BaseService<UserSubscription> {
     return true
   }
 
-  async add_purchased_credits(user_id: Types.ObjectId, quantity: number) {
+  async add_purchased_credits(user_id: Types.ObjectId, credit_pack_id: string) {
+    const credit_pack = await this.credit_pack_service.retrieve(credit_pack_id)
+
     const user_subscription = await this.find({ user: user_id })
 
     await this.user_subscription_model.findByIdAndUpdate(
       user_subscription._id,
       {
         $inc: {
-          'purchased_credits.total': quantity,
-          'purchased_credits.remaining': quantity,
+          'purchased_credits.total': credit_pack.credits,
+          'purchased_credits.remaining': credit_pack.credits,
         },
       },
     )

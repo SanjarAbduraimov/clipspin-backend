@@ -41,17 +41,15 @@ export class StripeService {
   }
 
   async create_credit_purchase_session(
-    quantity: number = 1,
+    price_id: string,
     metadata: Record<string, any>,
   ) {
-    const credit_price_id = this.config_service.get('stripe.credit_price_id')
-
     const session = await this.client.checkout.sessions.create({
       mode: 'payment',
       line_items: [
         {
-          price: credit_price_id,
-          quantity,
+          price: price_id,
+          quantity: 1,
         },
       ],
       success_url: this.success_url,
