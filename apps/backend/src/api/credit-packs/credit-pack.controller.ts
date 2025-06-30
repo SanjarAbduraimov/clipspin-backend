@@ -103,7 +103,7 @@ export class CreditPackController {
   @Delete('/:id')
   @AllowedRoles(UserRole.ADMIN)
   async delete(@Param('id') id: string) {
-    let credit_pack = await this.credit_pack_service.retrieve(id)
+    const credit_pack = await this.credit_pack_service.retrieve(id)
 
     if (!credit_pack) {
       throw new NotFoundError(CreditPackController.resource_name, {

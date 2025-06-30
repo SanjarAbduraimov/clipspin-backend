@@ -141,7 +141,7 @@ export class SubscriptionPlanController {
   @Delete('/:id')
   @AllowedRoles(UserRole.ADMIN)
   async delete(@Param('id') id: string) {
-    let subscription_plan = await this.subscription_plan_service.retrieve(id)
+    const subscription_plan = await this.subscription_plan_service.retrieve(id)
 
     if (!subscription_plan) {
       throw new NotFoundError(SubscriptionPlanController.resource_name, {
