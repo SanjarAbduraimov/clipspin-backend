@@ -31,6 +31,8 @@ export const validation_schema = Joi.object({
   STRIPE_SUCCESS_URL: Joi.string().required(),
   STRIPE_CANCEL_URL: Joi.string().required(),
   STRIPE_WEBHOOK_SECRET: Joi.string().required(),
+  RESEND_API_KEY: Joi.string().required(),
+  RESEND_FROM: Joi.string().required(),
 })
 
 export const configuration = () => ({
@@ -85,6 +87,10 @@ export const configuration = () => ({
     success_url: process.env.STRIPE_SUCCESS_URL,
     cancel_url: process.env.STRIPE_CANCEL_URL,
     webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
+  },
+  resend: {
+    api_key: process.env.RESEND_API_KEY,
+    from: process.env.RESEND_FROM,
   },
 })
 

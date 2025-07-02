@@ -51,7 +51,11 @@ export class AuthController {
     })
 
     try {
-      await this.emailService.send(email, `${code}`)
+      await this.emailService.send({
+        email,
+        text: `Your verification code: ${code}`,
+        subject: 'verification code',
+      })
     } catch (error) {
       console.log(error)
     }

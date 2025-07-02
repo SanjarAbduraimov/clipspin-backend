@@ -14,8 +14,5 @@ export class SendOTPPhoneEmailDTO {
 
 export class OTPResponseDTO {
   @Expose()
-  code: string
-
-  @Expose()
   code_hash: string
 }
