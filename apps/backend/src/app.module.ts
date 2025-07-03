@@ -41,10 +41,14 @@ import { LoggerMiddleware } from './middlewares/request-logger'
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const url = configService.get('redis.url')
+        const host = configService.get('redis.host')
+        const port = configService.get('redis.port')
 
         return {
-          url,
+          redis: {
+            host,
+            port,
+          },
         }
       },
       inject: [ConfigService],
