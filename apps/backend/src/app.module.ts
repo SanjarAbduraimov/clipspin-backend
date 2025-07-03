@@ -1,5 +1,5 @@
 import { BullModule } from '@nestjs/bull'
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
@@ -14,6 +14,7 @@ import { ProjectModule } from './api/projects/project.module'
 import { SubscriptionPlanModule } from './api/subscription-plans/subscription-plan.module'
 import { UserSubscriptionModule } from './api/user-subscriptions/user-subscription.module'
 import configuration from './config'
+import { LoggerMiddleware } from './middlewares/request-logger'
 
 @Module({
   imports: [
@@ -64,4 +65,8 @@ import configuration from './config'
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*')
+  }
+}
