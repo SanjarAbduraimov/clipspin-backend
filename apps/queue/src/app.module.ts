@@ -34,11 +34,15 @@ import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-genera
       useFactory: async (configService: ConfigService) => {
         const host = configService.get('redis.host')
         const port = configService.get('redis.port')
+        const username = configService.get('redis.username')
+        const password = configService.get('redis.password')
 
         return {
           redis: {
             host,
             port,
+            username,
+            password,
           },
         }
       },
