@@ -24,6 +24,7 @@ import { ErrorMessage } from '../../constants/errors'
 import { EmailService } from '../../services/email.service'
 import { AuthService } from './auth.service'
 import { GoogleAuthDTO, GoogleAuthResponseDTO } from './dto/google-auth.dto'
+import { LoginDTO } from './dto/login.dto'
 import { OTPResponseDTO, SendOTPPhoneEmailDTO } from './dto/otp.dto'
 import { SignInResponseDTO, SignUpDTO } from './dto/singup.dto'
 
@@ -106,7 +107,7 @@ export class AuthController {
   @ResponseDTO(SignInResponseDTO)
   async login(
     @Body()
-    { email, password }: SignUpDTO,
+    { email, password }: LoginDTO,
   ) {
     const user = await this.authService.getUserByEmail(email)
 
