@@ -14,10 +14,13 @@ export type UserDocument = HydratedDocument<User>
 })
 export class User {
   @Prop()
-  full_name?: string
+  full_name: string
+
+  @Prop({ unique: true })
+  email: string
 
   @Prop()
-  email?: string
+  phone_number?: string
 
   @Prop({ type: String, select: false })
   password: string
@@ -35,7 +38,7 @@ export class User {
     enum: EntityStatus,
     default: EntityStatus.ACTIVE,
   })
-  status?: EntityStatus = EntityStatus.ACTIVE
+  status: EntityStatus = EntityStatus.ACTIVE
 
   @Prop()
   deleted_at?: Date
@@ -47,5 +50,6 @@ UserSchema.pre('save', async function (this: any, next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 12)
   }
+
   next()
 })

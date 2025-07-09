@@ -1,8 +1,8 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
-  NotFoundException,
   Post,
   Query,
   Req,
@@ -11,18 +11,21 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiTags } from '@nestjs/swagger'
+import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
 
 import { Public } from '../../common/decarators/public.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
+import { AlreadyExistsError } from '../../common/errors/already-exists.error'
 import { ErrorMessage } from '../../constants/errors'
 import { EmailService } from '../../services/email.service'
 import { AuthService } from './auth.service'
 import { GoogleAuthDTO, GoogleAuthResponseDTO } from './dto/google-auth.dto'
 import { OTPResponseDTO, SendOTPPhoneEmailDTO } from './dto/otp.dto'
-import { SignInDTO, SignInResponseDTO } from './dto/singin.dto'
+import { SignInResponseDTO, SignUpDTO } from './dto/singup.dto'
 
 @ApiTags(AuthController.resource_name)
 @Controller('/api/auth')
@@ -33,6 +36,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Public()
@@ -64,20 +68,59 @@ export class AuthController {
   }
 
   @Public()
-  @Post('/signin')
+  @Post('/signup')
   @ResponseDTO(SignInResponseDTO)
-  async signin(@Body() { code, code_hash, email }: SignInDTO) {
-    const otp = await this.authService.getOTP({ code, code_hash })
+  async signup(
+    @Body()
+    { email, password, code, code_hash, phone_number, full_name }: SignUpDTO,
+  ) {
+    const otp = await this.authService.getOTP({
+      code,
+      code_hash,
+    })
 
     if (!otp) {
-      throw new NotFoundException(ErrorMessage.INVALID_OTP_CODE)
+      throw new BadRequestException(ErrorMessage.INVALID_OTP_CODE)
     }
 
-    const { access_token } = await this.authService.signIn({
+    const existing_user = await this.authService.getUserByEmail(email)
+
+    if (existing_user) {
+      throw new AlreadyExistsError('user')
+    }
+
+    const { access_token } = await this.authService.signup({
       email,
+      password,
+      full_name,
+      phone_number,
     })
 
     await this.authService.deleteOTP(otp._id)
+
+    return { data: { access_token } }
+  }
+
+  @Public()
+  @Post('/login')
+  @ResponseDTO(SignInResponseDTO)
+  async login(
+    @Body()
+    { email, password }: SignUpDTO,
+  ) {
+    const user = await this.authService.getUserByEmail(email)
+
+    if (!user) {
+      throw new BadRequestException('invalid username or password')
+    }
+
+    const password_matches = await bcrypt.compare(user.password, password)
+
+    if (!password_matches) {
+      throw new BadRequestException('invalid username or password')
+    }
+
+    const access_token = await this.jwtService.signAsync({ user: user._id })
 
     return { data: { access_token } }
   }

@@ -65,14 +65,8 @@ export class AuthService {
     return user
   }
 
-  async signIn({ email }: Partial<User>) {
-    const filter = { email, status: EntityStatus.ACTIVE }
-
-    const user = await this.userModel.findOneAndUpdate(
-      filter,
-      { email },
-      { upsert: true, new: true },
-    )
+  async signup(data: Partial<User>) {
+    const user = await this.userModel.create(data)
 
     const access_token = await this.jwtService.signAsync({ user: user._id })
 
