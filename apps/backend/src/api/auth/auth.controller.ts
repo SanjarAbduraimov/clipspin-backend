@@ -115,7 +115,7 @@ export class AuthController {
       throw new BadRequestException('invalid username or password')
     }
 
-    const password_matches = await bcrypt.compare(user.password, password)
+    const password_matches = await bcrypt.compare(password, user.password)
 
     if (!password_matches) {
       throw new BadRequestException('invalid username or password')
