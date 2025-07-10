@@ -37,6 +37,12 @@ export class AuthService {
       .update(code_token)
       .digest('hex')
 
+    await this.otpModel.create({
+      code,
+      code_hash,
+      created_at: Date.now()
+    })
+
     return { code, code_hash }
   }
 
