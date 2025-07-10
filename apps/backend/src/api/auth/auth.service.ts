@@ -28,7 +28,7 @@ export class AuthService {
     )
   }
 
-  async generateOTP() {
+  generateOTP() {
     const code = Math.floor(100000 + Math.random() * 900000)
 
     const code_token = crypto.randomBytes(32).toString('hex')
@@ -36,12 +36,6 @@ export class AuthService {
       .createHash('sha256')
       .update(code_token)
       .digest('hex')
-
-    await this.otpModel.create({
-      code,
-      code_hash,
-      created_at: Date.now()
-    })
 
     return { code, code_hash }
   }
