@@ -28,7 +28,7 @@ export class AuthService {
     )
   }
 
-  generateOTP() {
+  async generateOTP() {
     const code = Math.floor(100000 + Math.random() * 900000)
 
     const code_token = crypto.randomBytes(32).toString('hex')
