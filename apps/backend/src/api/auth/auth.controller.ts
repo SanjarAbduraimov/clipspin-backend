@@ -181,7 +181,7 @@ export class AuthController {
 
     const reset_token = await this.authService.createPasswordResetToken(email)
     const frontend_url = this.configService.get<string>('frontend_url')
-    const reset_url = `${frontend_url}/reset-password?token=${reset_token}`
+    const reset_url = `${frontend_url}/auth/reset-password?token=${reset_token}`
 
     try {
       await this.emailService.send({
