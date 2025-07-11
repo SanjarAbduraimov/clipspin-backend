@@ -57,6 +57,7 @@ export class AuthController {
       code,
       code_hash,
       email,
+      created_at: Date.now(),
       auth_method: 'email',
     })
 
