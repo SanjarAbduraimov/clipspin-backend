@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { InjectModel } from '@nestjs/mongoose'
-import * as bcrypt from 'bcryptjs'
 import { OAuth2Client } from 'google-auth-library'
 import { Model, Types } from 'mongoose'
 import * as crypto from 'node:crypto'
 
 import { EntityStatus } from '../../common/enums/status.enum'
 import { OTP } from '../../models/otp.schema'
+import { PasswordReset } from '../../models/password-reset.schema'
 import { User } from '../../models/user.schema'
 import { GoogleUserDTO } from './dto/google-auth.dto'
 
@@ -19,6 +19,8 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(OTP.name) readonly otpModel: Model<OTP>,
+    @InjectModel(PasswordReset.name)
+    readonly passwordResetModel: Model<PasswordReset>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
@@ -82,12 +84,6 @@ export class AuthService {
     return user
   }
 
-  async hashPassword(password: string) {
-    const hash = await bcrypt.hash(password, 12)
-
-    return hash
-  }
-
   async verifyGoogleToken(token: string): Promise<GoogleUserDTO> {
     try {
       const ticket = await this.googleClient.verifyIdToken({
@@ -131,5 +127,49 @@ export class AuthService {
     const access_token = await this.jwtService.signAsync({ user: user._id })
 
     return { access_token, user, redirect_url }
+  }
+
+  async createPasswordResetToken(email: string): Promise<string> {
+    const reset_token = crypto.randomBytes(32).toString('hex')
+
+    await this.passwordResetModel.findOneAndUpdate(
+      { email },
+      {
+        email,
+        token: reset_token,
+      },
+      { upsert: true, new: true },
+    )
+
+    return reset_token
+  }
+
+  async validatePasswordResetToken(
+    token: string,
+  ): Promise<PasswordReset | null> {
+    const reset_token = await this.passwordResetModel.findOne({ token })
+
+    return reset_token
+  }
+
+  async resetPassword(token: string, new_password: string): Promise<boolean> {
+    const reset_token = await this.validatePasswordResetToken(token)
+
+    if (!reset_token) {
+      return false
+    }
+
+    const user = await this.getUserByEmail(reset_token.email)
+
+    if (!user) {
+      return false
+    }
+
+    user.password = new_password
+    await user.save()
+
+    await this.passwordResetModel.deleteOne({ token })
+
+    return true
   }
 }

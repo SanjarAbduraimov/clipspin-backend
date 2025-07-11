@@ -26,6 +26,11 @@ import { AuthService } from './auth.service'
 import { GoogleAuthDTO, GoogleAuthResponseDTO } from './dto/google-auth.dto'
 import { LoginDTO } from './dto/login.dto'
 import { OTPResponseDTO, SendOTPPhoneEmailDTO } from './dto/otp.dto'
+import {
+  ForgotPasswordDTO,
+  PasswordResetResponseDTO,
+  ResetPasswordDTO,
+} from './dto/password-reset.dto'
 import { SignInResponseDTO, SignUpDTO } from './dto/singup.dto'
 
 @ApiTags(AuthController.resource_name)
@@ -161,5 +166,52 @@ export class AuthController {
     return res.redirect(
       `${frontend_url}/auth/google/callback?token=${result.access_token}`,
     )
+  }
+
+  @Public()
+  @Post('/forgot-password')
+  @ResponseDTO(PasswordResetResponseDTO)
+  async forgotPassword(@Body() { email }: ForgotPasswordDTO) {
+    const user = await this.authService.getUserByEmail(email)
+
+    if (!user) {
+      throw new BadRequestException('User with this email does not exist')
+    }
+
+    const reset_token = await this.authService.createPasswordResetToken(email)
+    const frontend_url = this.configService.get<string>('frontend_url')
+    const reset_url = `${frontend_url}/reset-password?token=${reset_token}`
+
+    try {
+      await this.emailService.send({
+        email,
+        subject: 'Password Reset',
+        text: `You requested a password reset. Please click on the link below to reset your password:\n\n${reset_url}\n\nIf you didn't request this, please ignore this email.`,
+      })
+
+      return {
+        success: true,
+        message: 'Password reset link sent to email',
+      }
+    } catch (error) {
+      console.log(error)
+      throw new BadRequestException('Failed to send password reset email')
+    }
+  }
+
+  @Public()
+  @Post('/reset-password')
+  @ResponseDTO(PasswordResetResponseDTO)
+  async resetPassword(@Body() { token, password }: ResetPasswordDTO) {
+    const success = await this.authService.resetPassword(token, password)
+
+    if (!success) {
+      throw new BadRequestException('Invalid or expired password reset token')
+    }
+
+    return {
+      success: true,
+      message: 'Password has been reset successfully',
+    }
   }
 }
