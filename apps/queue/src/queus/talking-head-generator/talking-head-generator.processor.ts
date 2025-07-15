@@ -42,6 +42,7 @@ export class TalkingHeadGeneratorQueueProcessor {
   @OnQueueFailed()
   onFailed(job: Job<GenerateTalkingHeadData>, error: Error) {
     console.log(`failed job "${job.name}" with data: `, job.data)
+    console.error(`Error in job "${job.name}":`, error)
 
     if (job.attemptsMade == job.opts.attempts) {
       const message = error.message

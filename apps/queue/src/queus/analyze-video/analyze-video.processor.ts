@@ -2,7 +2,10 @@ import { OnQueueActive, OnQueueFailed, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 import { Readable } from 'stream'
 
-import { ProjectProgress } from 'apps/backend/src/models/project.schema'
+import {
+  ProjectErrorCause,
+  ProjectProgress,
+} from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
@@ -34,6 +37,7 @@ export class AnalyzeVideoQueueProcessor {
   @OnQueueFailed()
   onFailed(job: Job<UploadVideoData>, error: Error) {
     console.log(`failed job "${job.name}" with data: `, job.data)
+    console.error(`Error in job "${job.name}":`, error)
 
     if (job.attemptsMade == job.opts.attempts) {
       const message = error.message
