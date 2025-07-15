@@ -55,4 +55,7 @@ export class ProjectResponseDTO {
 
   @Expose()
   error_cause: string
+
+  @Expose()
+  created_at: string
 }
