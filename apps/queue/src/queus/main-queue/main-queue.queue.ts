@@ -11,7 +11,6 @@ export enum MAIN_QUEUE_EVENTS {
   PROCESS = 'process',
   GENERATE = 'generate',
   OUTPUT = 'output',
-  TEST = 'test',
 }
 
 export interface MainQueueData {

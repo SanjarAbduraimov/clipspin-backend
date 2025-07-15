@@ -3,7 +3,11 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
 
 import { BaseService } from '../../common/services/base.service'
-import { Project, ProjectStatus } from '../../models/project.schema'
+import {
+  Project,
+  ProjectErrorCause,
+  ProjectStatus,
+} from '../../models/project.schema'
 import { UserSubscriptionService } from '../user-subscriptions/user-subscription.service'
 
 @Injectable()
@@ -15,12 +19,16 @@ export class ProjectService extends BaseService<Project> {
     super(project_model)
   }
 
-  async failed(project_id: Types.ObjectId) {
+  async failed(
+    project_id: Types.ObjectId,
+    error_cause?: ProjectErrorCause | string,
+  ) {
     this.update(project_id, {
       status: ProjectStatus.FAILED,
+      error_cause: error_cause || ProjectErrorCause.UNKNOWN_ERROR,
     })
 
-    this.return_used_credits(project_id)
+    await this.return_used_credits(project_id)
   }
 
   async return_used_credits(project_id: Types.ObjectId) {

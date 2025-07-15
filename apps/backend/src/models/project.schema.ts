@@ -46,6 +46,19 @@ export enum ProjectProgress {
   RESULTS_SAVED = 'results_saved',
 }
 
+export enum ProjectErrorCause {
+  INVALID_URL = 'invalid_url',
+  UNSUPPORTED_URL = 'unsupported_url',
+  FAILED_TO_DOWNLOAD = 'failed_to_download',
+  FAILED_TO_SAVE = 'failed_to_save',
+  FAILED_TO_PARSE = 'failed_to_parse',
+  FAILED_TO_ANALYZE = 'failed_to_analyze',
+  FAILED_TO_GENERATE_VIDEO = 'failed_to_generate_video',
+  FAILED_TO_GENERATE_SCENES = 'failed_to_generate_scenes',
+  FAILED_TO_GENERATE_SCRIPTS = 'failed_to_generate_scripts',
+  UNKNOWN_ERROR = 'unknown_error',
+}
+
 export class SlideShowScene {
   @Prop()
   scene_number?: number
@@ -178,6 +191,9 @@ export class Project {
 
   @Prop({ type: SlideShowScene })
   output?: ProjectOutput
+
+  @Prop()
+  error_cause?: string
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project)

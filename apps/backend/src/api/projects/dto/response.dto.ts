@@ -52,4 +52,7 @@ export class ProjectResponseDTO {
   @Expose()
   @Type(() => ProjectOutputDTO)
   output: ProjectOutputDTO
+
+  @Expose()
+  error_cause: string
 }

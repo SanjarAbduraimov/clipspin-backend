@@ -93,7 +93,7 @@ Avoid using emojis, video directions, or any kind of markup. Return only the raw
 
     const analysis = JSON.parse(response.text)
 
-    return Object.values(analysis).map((value) => ({ script: value }))
+    return Object.values(analysis).map((value) => ({ script: value as string }))
   }
 
   async analyze_youtube_video(url: string) {
@@ -144,6 +144,6 @@ Avoid using emojis, video directions, or any kind of markup. Return only the raw
 
     const analysis = JSON.parse(response.text)
 
-    return Object.values(analysis).map((value) => ({ script: value }))
+    return Object.values(analysis).map((value) => ({ script: value as string }))
   }
 }

@@ -12,6 +12,13 @@ import { OUTPUT_QUEUE_NAME, OutputQueue } from './output.queue'
   imports: [
     BullModule.registerQueue({
       name: OUTPUT_QUEUE_NAME,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'fixed',
+          delay: 15000,
+        },
+      },
     }),
     UserSubscriptionModule,
   ],

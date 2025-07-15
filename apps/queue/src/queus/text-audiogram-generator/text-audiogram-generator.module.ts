@@ -17,6 +17,13 @@ import {
   imports: [
     BullModule.registerQueue({
       name: TEXT_AUDIOGRAM_GENERATOR_QUEUE_NAME,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'fixed',
+          delay: 15000,
+        },
+      },
     }),
     ProjectModule,
     OutputQueueModule,

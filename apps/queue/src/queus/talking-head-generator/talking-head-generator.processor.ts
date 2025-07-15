@@ -1,4 +1,4 @@
-import { OnQueueActive, Process, Processor } from '@nestjs/bull'
+import { OnQueueActive, OnQueueFailed, Process, Processor } from '@nestjs/bull'
 import { ConfigService } from '@nestjs/config'
 import { ApifyClient } from 'apify-client'
 import { Job } from 'bull'
@@ -35,62 +35,59 @@ export class TalkingHeadGeneratorQueueProcessor {
   }
 
   @OnQueueActive()
-  onActive(job: Job) {
-    console.log(
-      `Processing job ${job.id} of type ${job.name} with data: `,
-      job.data,
-    )
+  onActive(job: Job<GenerateTalkingHeadData>) {
+    console.log(`processing job "${job.name}" with data: `, job.data)
+  }
+
+  @OnQueueFailed()
+  onFailed(job: Job<GenerateTalkingHeadData>, error: Error) {
+    console.log(`failed job "${job.name}" with data: `, job.data)
+
+    if (job.attemptsMade == job.opts.attempts) {
+      const message = error.message
+      this.project_service.failed(job.data.project_id, message)
+    }
   }
 
   @Process(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCRIPT)
   async generate_scenes(job: Job<GenerateTalkingHeadData>) {
-    try {
-      const project = await this.project_service.retrieve(job.data.project_id)
+    const project = await this.project_service.retrieve(job.data.project_id)
 
-      await this.project_service.update(project._id, {
-        progress: ProjectProgress.GENERATING_SCRIPT,
-      })
+    await this.project_service.update(project._id, {
+      progress: ProjectProgress.GENERATING_SCRIPT,
+    })
 
-      const script = await this.openai_service.generate_talking_head_script({
-        description: project.selected_idea.script,
-      })
+    const script = await this.openai_service.generate_talking_head_script({
+      description: project.selected_idea.script,
+    })
 
-      await this.project_service.update(project.id, {
-        talking_head_data: script,
-      })
+    await this.project_service.update(project.id, {
+      talking_head_data: script,
+    })
 
-      this.talking_head_generator_queue.generate_video({
-        project_id: project._id,
-      })
-    } catch (error) {
-      console.log(error)
-    }
+    this.talking_head_generator_queue.generate_video({
+      project_id: project._id,
+    })
   }
 
   @Process(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_VIDEO)
   async generate_video(job: Job<GenerateTalkingHeadData>) {
-    try {
-      const project = await this.project_service.retrieve(job.data.project_id)
+    const project = await this.project_service.retrieve(job.data.project_id)
 
-      await this.project_service.update(project._id, {
-        progress: ProjectProgress.GENERATING_VIDEO,
-      })
+    await this.project_service.update(project._id, {
+      progress: ProjectProgress.GENERATING_VIDEO,
+    })
 
-      const video = await this.heygen_service.generate_video({
-        script: project.talking_head_data.script,
-        title: project.talking_head_data.title,
-        callback_id: project._id.toString(),
-      })
+    const video = await this.heygen_service.generate_video({
+      script: project.talking_head_data.script,
+      title: project.talking_head_data.title,
+      callback_id: project._id.toString(),
+    })
 
-      await this.project_service.update(job.data.project_id, {
-        output: {
-          video_id: video.data.video_id,
-        },
-      })
-    } catch (error) {
-      console.log(error?.response?.data || error?.message)
-
-      this.project_service.failed(job.data.project_id)
-    }
+    await this.project_service.update(job.data.project_id, {
+      output: {
+        video_id: video.data.video_id,
+      },
+    })
   }
 }

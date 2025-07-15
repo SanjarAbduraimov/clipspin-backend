@@ -15,17 +15,21 @@ export class FalAIService {
   }
 
   async generate_image({ prompt }: { prompt: string }) {
-    const response = await this.client.run('fal-ai/flux/dev', {
-      input: {
-        prompt: prompt,
-        image_size: 'portrait_16_9',
-        num_inference_steps: 28,
-        guidance_scale: 3.5,
-        num_images: 1,
-        enable_safety_checker: true,
-      },
-    })
+    try {
+      const response = await this.client.run('fal-ai/flux/dev', {
+        input: {
+          prompt: prompt,
+          image_size: 'portrait_16_9',
+          num_inference_steps: 28,
+          guidance_scale: 3.5,
+          num_images: 1,
+          enable_safety_checker: true,
+        },
+      })
 
-    return response.data.images[0]
+      return response.data.images[0]
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCENES)
+    }
   }
 }

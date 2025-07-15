@@ -16,6 +16,13 @@ import {
   imports: [
     BullModule.registerQueue({
       name: INPUT_VIDEO_PARSER_QUEUE_NAME,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'fixed',
+          delay: 15000,
+        },
+      },
     }),
     ProjectModule,
     AnalyzeVideoQueueModule,

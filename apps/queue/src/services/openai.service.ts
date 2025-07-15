@@ -39,17 +39,18 @@ export class OpenAIService {
   }
 
   async generate_scenes({ description }: { description: string }) {
-    const response = await this.client.responses.parse({
-      model: 'gpt-4o-mini',
-      input: [
-        {
-          role: 'system',
-          content:
-            'You are a creative AI assistant helping generate visual storyboards for short-form content. Based on the inputs below, your task is to generate a sequence of realistic image prompts, subtle movement ideas, and voiceover lines for each scene.',
-        },
-        {
-          role: 'user',
-          content: `
+    try {
+      const response = await this.client.responses.parse({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content:
+              'You are a creative AI assistant helping generate visual storyboards for short-form content. Based on the inputs below, your task is to generate a sequence of realistic image prompts, subtle movement ideas, and voiceover lines for each scene.',
+          },
+          {
+            role: 'user',
+            content: `
 **Input:**
 
 * Description: ${description}
@@ -69,23 +70,27 @@ export class OpenAIService {
 
 3. Keep all scenes thematically connected and based on the Description.
 `,
+          },
+        ],
+        text: {
+          format: zodTextFormat(slide_show_scenes_schema, 'scenes'),
         },
-      ],
-      text: {
-        format: zodTextFormat(slide_show_scenes_schema, 'scenes'),
-      },
-    })
+      })
 
-    return response.output_parsed.scenes
+      return response.output_parsed.scenes
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCRIPTS)
+    }
   }
 
   async generate_script({ description }: { description: string }) {
-    const response = await this.client.responses.parse({
-      model: 'gpt-4o-mini',
-      input: [
-        {
-          role: 'system',
-          content: `You are an expert prompt engineer specializing in generating highly detailed cinematic image prompts combined with engaging speech texts for narrative-driven audio-visual productions. Your primary responsibility is to craft speech texts accompanied by visually rich image prompts suitable for monogram speech generation and visual storytelling purposes.
+    try {
+      const response = await this.client.responses.parse({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content: `You are an expert prompt engineer specializing in generating highly detailed cinematic image prompts combined with engaging speech texts for narrative-driven audio-visual productions. Your primary responsibility is to craft speech texts accompanied by visually rich image prompts suitable for monogram speech generation and visual storytelling purposes.
 
 Whenever a user provides the core idea, theme, or brief scenario for a short video, you must generate a JSON object exactly structured as follows:
 
@@ -109,29 +114,33 @@ EXAMPLE:
       "image_prompt": "A rugged path leads through a misty forest at dawn, where soft golden rays filter through dense, tall trees, illuminating the rich textures of moss-covered rocks and fallen leaves. In the foreground, a solitary figure—a young woman in her late twenties—stands with her back towards us, wearing a weathered brown jacket and sturdy hiking boots, gaze fixed on the distant horizon. Her posture signifies determination despite the challenges ahead, and a look of quiet resolve is captured in her stance. The midground reveals a winding trail that disappears into the thickness of the trees, while the background features silhouettes of mountains shrouded in early morning fog. The overall atmosphere is serene yet charged with the promise of adventure, inviting the viewer to contemplate their own journey. Style: cinematic, high-detail, ultra-realistic, 8K, wide-angle."
   }
 ]`,
-        },
-        {
-          role: 'user',
-          content: `
+          },
+          {
+            role: 'user',
+            content: `
 Quote Idea: ${description}
 `,
+          },
+        ],
+        text: {
+          format: zodTextFormat(text_audigram_script_schema, 'scenes'),
         },
-      ],
-      text: {
-        format: zodTextFormat(text_audigram_script_schema, 'scenes'),
-      },
-    })
+      })
 
-    return response.output_parsed
+      return response.output_parsed
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCRIPTS)
+    }
   }
 
   async generate_talking_head_script({ description }: { description: string }) {
-    const response = await this.client.responses.parse({
-      model: 'gpt-4o-mini',
-      input: [
-        {
-          role: 'system',
-          content: `You are a specialized AI agent engineered to transform raw video content into optimized voiceover scripts for AI avatar-driven short-form videos across TikTok, YouTube Shorts, and Instagram Reels. Your singular focus is producing immediately actionable, platform-optimized voiceover content that maximizes engagement and retention.
+    try {
+      const response = await this.client.responses.parse({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content: `You are a specialized AI agent engineered to transform raw video content into optimized voiceover scripts for AI avatar-driven short-form videos across TikTok, YouTube Shorts, and Instagram Reels. Your singular focus is producing immediately actionable, platform-optimized voiceover content that maximizes engagement and retention.
 
 ## Critical Output Requirements
 
@@ -202,19 +211,22 @@ Quote Idea: ${description}
 - **Unclear value**: Vague benefits or abstract concepts
 - **Poor transitions**: Jarring shifts between ideas
 - **Weak conclusion**: Passive or unclear call-to-action`,
-        },
-        {
-          role: 'user',
-          content: `
+          },
+          {
+            role: 'user',
+            content: `
 Video scripts: ${description}
 `,
+          },
+        ],
+        text: {
+          format: zodTextFormat(talking_head_script_schema, 'script'),
         },
-      ],
-      text: {
-        format: zodTextFormat(talking_head_script_schema, 'script'),
-      },
-    })
+      })
 
-    return response.output_parsed
+      return response.output_parsed
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCRIPTS)
+    }
   }
 }

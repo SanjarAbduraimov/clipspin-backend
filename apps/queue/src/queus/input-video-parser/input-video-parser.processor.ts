@@ -1,10 +1,11 @@
-import { OnQueueActive, Process, Processor } from '@nestjs/bull'
+import { OnQueueActive, OnQueueFailed, Process, Processor } from '@nestjs/bull'
 import { ConfigService } from '@nestjs/config'
 import { ApifyClient } from 'apify-client'
 import { Job } from 'bull'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
+  ProjectErrorCause,
   ProjectInput,
   ProjectInputSource,
   ProjectProgress,
@@ -40,11 +41,18 @@ export class InputVideoParserQueueProcessor {
   }
 
   @OnQueueActive()
-  onActive(job: Job) {
-    console.log(
-      `Processing job ${job.id} of type ${job.name} with data: `,
-      job.data,
-    )
+  onActive(job: Job<DownloadVideoData>) {
+    console.log(`processing job "${job.name}" with data: `, job.data)
+  }
+
+  @OnQueueFailed()
+  onFailed(job: Job<DownloadVideoData>, error: Error) {
+    console.log(`failed job "${job.name}" with data: `, job.data)
+
+    if (job.attemptsMade == job.opts.attempts) {
+      const message = error.message
+      this.project_service.failed(job.data.project_id, message)
+    }
   }
 
   async get_instagram_video(url: string): Promise<ProjectInput> {
@@ -65,7 +73,7 @@ export class InputVideoParserQueueProcessor {
     const video_url = items[0]?.videoUrl
 
     if (!video_url) {
-      throw new Error('Video URL not found in the dataset items')
+      throw new Error(ProjectErrorCause.FAILED_TO_PARSE)
     }
 
     return {
@@ -90,7 +98,7 @@ export class InputVideoParserQueueProcessor {
     const video_url = (items[0]?.video as any)?.url
 
     if (!video_url) {
-      throw new Error('Video URL not found in the dataset items')
+      throw new Error(ProjectErrorCause.FAILED_TO_PARSE)
     }
 
     return {
@@ -113,7 +121,7 @@ export class InputVideoParserQueueProcessor {
       const parsed_url = new URL(url)
       hostname = parsed_url.hostname.replace('www.', '')
     } catch (error) {
-      throw new Error('Invalid URL')
+      throw new Error(ProjectErrorCause.INVALID_URL)
     }
 
     switch (hostname) {
@@ -131,7 +139,7 @@ export class InputVideoParserQueueProcessor {
       case 'youtu.be':
         return this.get_youtube_video(url)
       default:
-        throw new Error(`Unsupported URL domain: ${hostname}`)
+        throw new Error(ProjectErrorCause.UNSUPPORTED_URL)
     }
   }
 
@@ -139,7 +147,7 @@ export class InputVideoParserQueueProcessor {
     const response = await fetch(url)
 
     if (!response.ok) {
-      throw new Error(`Failed to download video: ${response.statusText}`)
+      throw new Error(ProjectErrorCause.FAILED_TO_DOWNLOAD)
     }
 
     const array_buffer = await response.arrayBuffer()
@@ -162,50 +170,44 @@ export class InputVideoParserQueueProcessor {
 
   @Process(INPUT_VIDEO_PARSER_QUEUE_EVENTS.DOWNLOAD_VIDEO)
   async process(job: Job<DownloadVideoData>) {
-    try {
-      const project = await this.project_service.retrieve(job.data.project_id)
+    const project = await this.project_service.retrieve(job.data.project_id)
 
+    await this.project_service.update(project._id, {
+      status: ProjectStatus.IN_PROGRESS,
+      progress: ProjectProgress.FETCHING_INPUT,
+    })
+
+    const { url: video_url, source } = await this.get_download_url(
+      project.input.url,
+    )
+
+    if (source == ProjectInputSource.YOUTUBE) {
       await this.project_service.update(project._id, {
-        status: ProjectStatus.IN_PROGRESS,
-        progress: ProjectProgress.FETCHING_INPUT,
+        progress: ProjectProgress.INPUT_FETCHED,
+        input: {
+          ...project.input,
+          source,
+        },
       })
 
-      const { url: video_url, source } = await this.get_download_url(
-        project.input.url,
-      )
+      this.analyze_video_queue.analyze_youtube_video({
+        project_id: project._id,
+      })
+    } else {
+      const video_buffer = await this.download_video(video_url)
 
-      if (source == ProjectInputSource.YOUTUBE) {
-        await this.project_service.update(project._id, {
-          progress: ProjectProgress.INPUT_FETCHED,
-          input: {
-            ...project.input,
-            source,
-          },
-        })
+      const file_key = await this.save_video(video_buffer)
 
-        this.analyze_video_queue.analyze_youtube_video({
-          project_id: project._id,
-        })
-      } else {
-        const video_buffer = await this.download_video(video_url)
+      await this.project_service.update(project._id, {
+        progress: ProjectProgress.INPUT_FETCHED,
+        input: {
+          ...project.input,
+          source,
+          file_key,
+        },
+      })
 
-        const file_key = await this.save_video(video_buffer)
-
-        await this.project_service.update(project._id, {
-          progress: ProjectProgress.INPUT_FETCHED,
-          input: {
-            ...project.input,
-            source,
-            file_key,
-          },
-        })
-
-        this.analyze_video_queue.upload_video({ project_id: project._id })
-      }
-    } catch (error) {
-      console.log(error)
-
-      this.project_service.failed(job.data.project_id)
+      this.analyze_video_queue.upload_video({ project_id: project._id })
     }
   }
 }

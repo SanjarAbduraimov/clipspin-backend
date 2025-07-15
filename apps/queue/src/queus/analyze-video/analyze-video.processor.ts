@@ -1,4 +1,4 @@
-import { OnQueueActive, Process, Processor } from '@nestjs/bull'
+import { OnQueueActive, OnQueueFailed, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 import { Readable } from 'stream'
 
@@ -27,11 +27,18 @@ export class AnalyzeVideoQueueProcessor {
   ) {}
 
   @OnQueueActive()
-  onActive(job: Job) {
-    console.log(
-      `Processing job ${job.id} of type ${job.name} with data: `,
-      job.data,
-    )
+  onActive(job: Job<UploadVideoData>) {
+    console.log(`processing job "${job.name}" with data: `, job.data)
+  }
+
+  @OnQueueFailed()
+  onFailed(job: Job<UploadVideoData>, error: Error) {
+    console.log(`failed job "${job.name}" with data: `, job.data)
+
+    if (job.attemptsMade == job.opts.attempts) {
+      const message = error.message
+      this.project_service.failed(job.data.project_id, message)
+    }
   }
 
   @Process(ANALYZE_VIDEO_QUEUE_EVENTS.UPLOAD_VIDEO)
@@ -56,9 +63,7 @@ export class AnalyzeVideoQueueProcessor {
         file_name: file_context.name,
       })
     } catch (error) {
-      console.log(error)
-
-      this.project_service.failed(job.data.project_id)
+      throw new Error(ProjectErrorCause.FAILED_TO_ANALYZE)
     }
   }
 
@@ -78,9 +83,7 @@ export class AnalyzeVideoQueueProcessor {
         progress: ProjectProgress.INPUT_ANALYZED,
       })
     } catch (error) {
-      console.log(error)
-
-      this.project_service.failed(job.data.project_id)
+      throw new Error(ProjectErrorCause.FAILED_TO_ANALYZE)
     }
   }
 
@@ -98,9 +101,7 @@ export class AnalyzeVideoQueueProcessor {
         progress: ProjectProgress.INPUT_ANALYZED,
       })
     } catch (error) {
-      console.log(error)
-
-      this.project_service.failed(job.data.project_id)
+      throw new Error(ProjectErrorCause.FAILED_TO_ANALYZE)
     }
   }
 }

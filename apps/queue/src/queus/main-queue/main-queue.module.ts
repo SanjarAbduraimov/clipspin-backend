@@ -7,6 +7,13 @@ import { MAIN_QUEUE_NAME, MainQueue } from './main-queue.queue'
   imports: [
     BullModule.registerQueue({
       name: MAIN_QUEUE_NAME,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'fixed',
+          delay: 15000,
+        },
+      },
     }),
   ],
   providers: [MainQueue],

@@ -27,34 +27,36 @@ export class HeygenService {
     script: string
     callback_id: string
   }): Promise<any> {
-    console.log(this.callback_url)
-
-    const response = await this.client.post(
-      `/v2/template/23309bc49e3c4f9da72f34aab6b6108b/generate`,
-      {
-        caption: false,
-        title: 'TEST API',
-        variables: {
-          script_en: {
-            name: 'script_en',
-            type: 'text',
-            properties: {
-              content: script,
+    try {
+      const response = await this.client.post(
+        `/v2/template/23309bc49e3c4f9da72f34aab6b6108b/generate`,
+        {
+          caption: false,
+          title: 'TEST API',
+          variables: {
+            script_en: {
+              name: 'script_en',
+              type: 'text',
+              properties: {
+                content: script,
+              },
             },
           },
+          dimension: {
+            width: 720,
+            height: 1280,
+          },
+          option: {
+            remove_logo: true,
+          },
+          callback_url: this.callback_url,
+          callback_id,
         },
-        dimension: {
-          width: 720,
-          height: 1280,
-        },
-        option: {
-          remove_logo: true,
-        },
-        callback_url: this.callback_url,
-        callback_id,
-      },
-    )
+      )
 
-    return response.data
+      return response.data
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_VIDEO)
+    }
   }
 }

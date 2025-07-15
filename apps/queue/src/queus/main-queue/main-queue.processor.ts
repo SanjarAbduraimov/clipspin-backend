@@ -1,7 +1,10 @@
-import { OnQueueActive, Process, Processor } from '@nestjs/bull'
+import { OnQueueActive, OnQueueFailed, Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 
-import { ProjectType } from 'apps/backend/src/models/project.schema'
+import {
+  ProjectErrorCause,
+  ProjectType,
+} from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
@@ -29,11 +32,18 @@ export class MainQueueProcessor {
   ) {}
 
   @OnQueueActive()
-  onActive(job: Job) {
-    console.log(
-      `Processing job ${job.id} of type ${job.name} with data: `,
-      job.data,
-    )
+  onActive(job: Job<MainQueueData>) {
+    console.log(`processing job "${job.name}" with data: `, job.data)
+  }
+
+  @OnQueueFailed()
+  onFailed(job: Job<MainQueueData>, error: Error) {
+    console.log(`failed job "${job.name}" with data: `, job.data)
+
+    if (job.attemptsMade == job.opts.attempts) {
+      const message = error.message
+      this.project_service.failed(job.data.project_id, message)
+    }
   }
 
   @Process(MAIN_QUEUE_EVENTS.PROCESS)
@@ -71,21 +81,12 @@ export class MainQueueProcessor {
           break
       }
     } catch (error) {
-      console.log(error)
-
-      this.project_service.failed(job.data.project_id)
+      new Error(ProjectErrorCause.FAILED_TO_GENERATE_VIDEO)
     }
   }
 
   @Process(MAIN_QUEUE_EVENTS.OUTPUT)
   async output(job: Job<OutputQueueData>) {
     this.output_queue.save(job.data)
-  }
-
-  @Process(MAIN_QUEUE_EVENTS.TEST)
-  async test(job: Job<MainQueueData>) {
-    this.test_queue.generate_video({
-      project_id: job.data.project_id,
-    })
   }
 }
