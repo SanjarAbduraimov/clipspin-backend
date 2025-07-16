@@ -20,11 +20,14 @@ export const GetContext = createParamDecorator(
   (_: string, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest<Request>()
 
-    // @ts-expect-error user
-    const user = request.user
+    const user = request.user as UserDocument
+    const skip = +request.query.skip
+    const limit = +request.query.limit
 
     const ctx: Context = {
       user,
+      skip: isNaN(skip) ? 0 : skip,
+      limit: isNaN(limit) ? 10 : limit,
     }
 
     return ctx
