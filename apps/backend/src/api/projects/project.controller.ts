@@ -35,28 +35,28 @@ export class ProjectController {
   @Get('/')
   @ResponseDTO(ProjectResponseDTO)
   async getAll(@GetContext() ctx: Context) {
-    const projects = await this.project_service.list(
+    const { data: projects, total } = await this.project_service.list(
       {
         user: ctx.user._id,
       },
       ctx,
     )
 
-    return { data: projects }
+    return { data: projects, total }
   }
 
   @Get('/professional')
   @AllowedRoles(UserRole.EDITOR)
   @ResponseDTO(ProjectResponseDTO)
   async getEditorProjects(@GetContext() ctx: Context) {
-    const projects = await this.project_service.list(
+    const { data: projects, total } = await this.project_service.list(
       {
         type: ProjectType.PROFESSIONAL,
       },
       ctx,
     )
 
-    return { data: projects }
+    return { data: projects, total }
   }
 
   @Get('/:id')

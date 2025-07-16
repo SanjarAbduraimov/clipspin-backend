@@ -19,9 +19,9 @@ export class UsersController {
   @AllowedRoles(UserRole.ADMIN)
   @ResponseDTO(UserResponseDTO, { isArray: true })
   async list(@GetContext() ctx: Context) {
-    const users = await this.users_service.list({}, ctx)
+    const { data: users, total } = await this.users_service.list({}, ctx)
 
-    return { data: users }
+    return { data: users, total }
   }
 
   @Patch('/:id/role')

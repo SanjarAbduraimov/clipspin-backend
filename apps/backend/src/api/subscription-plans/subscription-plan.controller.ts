@@ -43,9 +43,10 @@ export class SubscriptionPlanController {
   @Get('/')
   @ResponseDTO(SubscriptionPlanResponseDTO)
   async getAll(@GetContext() ctx: Context) {
-    const subscription_plan = await this.subscription_plan_service.list({}, ctx)
+    const { data: subscription_plan, total } =
+      await this.subscription_plan_service.list({}, ctx)
 
-    return { data: subscription_plan }
+    return { data: subscription_plan, total }
   }
 
   @Get('/:id')

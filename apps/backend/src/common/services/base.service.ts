@@ -17,7 +17,7 @@ export class BaseService<T> {
   async list(
     filter: FilterQuery<T>,
     context: Context = DEFAULT_CONTEXT,
-  ): Promise<HydratedDocument<T>[]> {
+  ): Promise<{ data: HydratedDocument<T>[]; total: number }> {
     const { skip = 0, limit, populate } = context
 
     const documents = await this.model
@@ -26,7 +26,9 @@ export class BaseService<T> {
       .skip(skip)
       .limit(limit)
 
-    return documents
+    const total = await this.model.countDocuments(filter)
+
+    return { data: documents, total }
   }
 
   async find(

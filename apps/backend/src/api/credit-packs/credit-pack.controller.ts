@@ -26,9 +26,10 @@ export class CreditPackController {
   @Get('/')
   @ResponseDTO(CreditPackResponseDTO)
   async getAll(@GetContext() ctx: Context) {
-    const subscription_plan = await this.credit_pack_service.list({}, ctx)
+    const { data: subscription_plan, total } =
+      await this.credit_pack_service.list({}, ctx)
 
-    return { data: subscription_plan }
+    return { data: subscription_plan, total }
   }
 
   @Get('/:id')
