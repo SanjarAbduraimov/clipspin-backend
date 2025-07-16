@@ -21,7 +21,7 @@ export const GetContext = createParamDecorator(
     const request = context.switchToHttp().getRequest<Request>()
 
     const user = request.user as UserDocument
-    const skip = +request.query.skip
+    const skip = (+request.query.page || 1 - 1) * +request.query.limit
     const limit = +request.query.limit
 
     const ctx: Context = {
