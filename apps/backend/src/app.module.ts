@@ -13,6 +13,7 @@ import { ProfileModule } from './api/profile/profile.module'
 import { ProjectModule } from './api/projects/project.module'
 import { SubscriptionPlanModule } from './api/subscription-plans/subscription-plan.module'
 import { UserSubscriptionModule } from './api/user-subscriptions/user-subscription.module'
+import { UsersModule } from './api/users/users.module'
 import configuration from './config'
 import { LoggerMiddleware } from './middlewares/request-logger'
 
@@ -64,6 +65,7 @@ import { LoggerMiddleware } from './middlewares/request-logger'
     SubscriptionPlanModule,
     UserSubscriptionModule,
     CreditPackModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [
