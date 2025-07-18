@@ -25,6 +25,7 @@ export class BaseService<T> {
       .populate(populate)
       .skip(skip)
       .limit(limit)
+      .sort({ created_at: -1 })
 
     const total = await this.model.countDocuments(filter)
 
