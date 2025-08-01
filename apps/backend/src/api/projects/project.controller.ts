@@ -53,7 +53,6 @@ export class ProjectController {
   }
 
   @Get('/list')
-  @Public()
   @AllowedRoles(UserRole.ADMIN)
   @ResponseDTO(ProjectResponseDTO)
   async list(@GetContext() ctx: Context, @QueryFilter() filter: any) {
