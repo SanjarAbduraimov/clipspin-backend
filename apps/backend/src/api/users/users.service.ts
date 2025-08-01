@@ -35,7 +35,8 @@ export class UsersService extends BaseService<User> {
       throw new Error('User subscription not found')
     }
 
-    const increment_amount = operation === CreditOperation.ADD ? amount : -amount
+    const increment_amount =
+      operation === CreditOperation.ADD ? amount : -amount
 
     await this.user_subscription_service.update(user_subscription._id, {
       $inc: {
