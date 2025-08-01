@@ -6,6 +6,7 @@ import { ResponseDTO } from '../../common/decarators/response.decarator'
 import { AllowedRoles } from '../../common/decarators/role.decarator'
 import { UserRole } from '../../common/enums/role.enum'
 import { UpdateRoleDTO } from './dto/update-role.dto'
+import { UpdateCreditsDTO } from './dto/update-credits.dto'
 import { UserResponseDTO } from './dto/user-response.dto'
 import { UsersService } from './users.service'
 
@@ -31,5 +32,20 @@ export class UsersController {
     const user = await this.users_service.update_role(id, role)
 
     return { data: user }
+  }
+
+  @Patch('/:id/credits')
+  @AllowedRoles(UserRole.ADMIN)
+  async updateCredits(
+    @Param('id') id: string,
+    @Body() { operation, amount }: UpdateCreditsDTO,
+  ) {
+    const user_subscription = await this.users_service.update_purchased_credits(
+      id,
+      operation,
+      amount,
+    )
+
+    return { data: user_subscription }
   }
 }
