@@ -20,6 +20,7 @@ import { UserRole } from '../../common/enums/role.enum'
 import { BadRequestError } from '../../common/errors/bad-request.error'
 import { NotFoundError } from '../../common/errors/not-fount.error'
 import { StripeService } from '../../services/stripe.service'
+import { CreditPackService } from '../credit-packs/credit-pack.service'
 import { ProfileService } from '../profile/profile.service'
 import { UserSubscriptionService } from '../user-subscriptions/user-subscription.service'
 import { CreateSubscriptionPlanDTO } from './dto/create.dto'
@@ -36,6 +37,7 @@ export class SubscriptionPlanController {
   constructor(
     private readonly subscription_plan_service: SubscriptionPlanService,
     private readonly user_subscription_service: UserSubscriptionService,
+    private readonly credit_pack_service: CreditPackService,
     private readonly stripe_service: StripeService,
     private readonly profile_service: ProfileService,
   ) {}
@@ -187,9 +189,12 @@ export class SubscriptionPlanController {
 
         const user = await this.profile_service.retrieve(user_id)
 
+        const credit_pack =
+          await this.credit_pack_service.retrieve(credit_pack_id)
+
         await this.user_subscription_service.add_purchased_credits(
           user._id,
-          credit_pack_id,
+          credit_pack.credits,
         )
       }
     }

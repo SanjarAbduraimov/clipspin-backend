@@ -2,6 +2,7 @@ import { Expose, Transform, Type } from 'class-transformer'
 
 import { transform_object_id } from 'apps/backend/src/common/utils/transform-object-id'
 
+import { UserResponseDTO } from '../../users/dto/user-response.dto'
 import { ProjectOutputDTO } from './result.dto'
 
 export class ProjectInputDTO {
@@ -22,7 +23,7 @@ export class ProjectIdeaDTO {
 
 export class ProjectResponseDTO {
   @Expose()
-  @Transform(transform_object_id)
+  @Transform(transform_object_id())
   _id: string
 
   @Expose()
@@ -57,8 +58,12 @@ export class ProjectResponseDTO {
   error_cause: string
 
   @Expose()
-  @Transform(transform_object_id)
+  @Transform(transform_object_id())
   voice?: string
+
+  @Expose()
+  @Type(() => UserResponseDTO)
+  user?: UserResponseDTO
 
   @Expose()
   created_at: string

@@ -5,6 +5,7 @@ import { MainQueue } from 'apps/queue/src/queus/main-queue/main-queue.queue'
 
 import { Context, GetContext } from '../../common/decarators/context.decarator'
 import { Public } from '../../common/decarators/public.decarator'
+import { QueryFilter } from '../../common/decarators/query-filter.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
 import { AllowedRoles } from '../../common/decarators/role.decarator'
 import { User } from '../../common/decarators/user.decarator'
@@ -47,6 +48,19 @@ export class ProjectController {
       },
       ctx,
     )
+
+    return { data: projects, total }
+  }
+
+  @Get('/list')
+  @Public()
+  @AllowedRoles(UserRole.ADMIN)
+  @ResponseDTO(ProjectResponseDTO)
+  async list(@GetContext() ctx: Context, @QueryFilter() filter: any) {
+    const { data: projects, total } = await this.project_service.list(filter, {
+      ...ctx,
+      populate: 'user voice',
+    })
 
     return { data: projects, total }
   }

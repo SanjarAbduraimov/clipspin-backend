@@ -38,12 +38,10 @@ export class UsersService extends BaseService<User> {
     const increment_amount =
       operation === CreditOperation.ADD ? amount : -amount
 
-    await this.user_subscription_service.update(user_subscription._id, {
-      $inc: {
-        'purchased_credits.total': increment_amount,
-        'purchased_credits.remaining': increment_amount,
-      },
-    })
+    await this.user_subscription_service.add_purchased_credits(
+      user_subscription._id,
+      increment_amount,
+    )
 
     return this.user_subscription_service.retrieve(user_subscription._id)
   }

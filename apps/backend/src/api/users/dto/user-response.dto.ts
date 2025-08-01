@@ -6,7 +6,7 @@ import { transform_object_id } from '../../../common/utils/transform-object-id'
 
 export class UserResponseDTO {
   @Expose()
-  @Transform(transform_object_id)
+  @Transform(transform_object_id())
   _id: string
 
   @Expose()

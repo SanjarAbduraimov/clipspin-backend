@@ -6,6 +6,7 @@ import {
   SubscriptionPlanSchema,
 } from '../../models/subscription-plan.schema'
 import { StripeService } from '../../services/stripe.service'
+import { CreditPackModule } from '../credit-packs/credit-pack.module'
 import { ProfileModule } from '../profile/profile.module'
 import { UserSubscriptionModule } from '../user-subscriptions/user-subscription.module'
 import { SubscriptionPlanController } from './subscription-plan.controller'
@@ -21,6 +22,7 @@ import { SubscriptionPlanService } from './subscription-plan.service'
     ]),
     forwardRef(() => UserSubscriptionModule),
     forwardRef(() => ProfileModule),
+    CreditPackModule,
   ],
   controllers: [SubscriptionPlanController],
   providers: [StripeService, SubscriptionPlanService],

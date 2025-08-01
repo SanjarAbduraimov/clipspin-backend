@@ -6,7 +6,7 @@ import { transform_object_id } from 'apps/backend/src/common/utils/transform-obj
 export class ProfileResponseDTO {
   @Expose()
   @IsString()
-  @Transform(transform_object_id)
+  @Transform(transform_object_id())
   _id: string
 
   @Expose()

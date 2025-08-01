@@ -17,14 +17,20 @@ export default async () => {
     ['./api/user-subscriptions/dto/response.dto']: await import(
       './api/user-subscriptions/dto/response.dto'
     ),
+    ['./common/enums/role.enum']: await import('./common/enums/role.enum'),
+    ['./common/enums/status.enum']: await import('./common/enums/status.enum'),
     ['./api/projects/dto/response.dto']: await import(
       './api/projects/dto/response.dto'
     ),
     ['./api/projects/dto/result.dto']: await import(
       './api/projects/dto/result.dto'
     ),
-    ['./common/enums/role.enum']: await import('./common/enums/role.enum'),
-    ['./common/enums/status.enum']: await import('./common/enums/status.enum'),
+    ['./api/users/dto/user-response.dto']: await import(
+      './api/users/dto/user-response.dto'
+    ),
+    ['./api/users/dto/update-credits.dto']: await import(
+      './api/users/dto/update-credits.dto'
+    ),
   }
   return {
     '@nestjs/swagger': {
@@ -313,6 +319,27 @@ export default async () => {
           },
         ],
         [
+          import('./api/users/dto/user-response.dto'),
+          {
+            UserResponseDTO: {
+              _id: { required: true, type: () => String },
+              full_name: { required: true, type: () => String },
+              email: { required: true, type: () => String },
+              phone_number: { required: false, type: () => String },
+              role: {
+                required: true,
+                enum: t['./common/enums/role.enum'].UserRole,
+              },
+              status: {
+                required: true,
+                enum: t['./common/enums/status.enum'].EntityStatus,
+              },
+              created_at: { required: true, type: () => Date },
+              updated_at: { required: true, type: () => Date },
+            },
+          },
+        ],
+        [
           import('./api/projects/dto/result.dto'),
           {
             ProjectOutputDTO: {
@@ -354,6 +381,11 @@ export default async () => {
               },
               error_cause: { required: true, type: () => String },
               voice: { required: false, type: () => String },
+              user: {
+                required: false,
+                type: () =>
+                  t['./api/users/dto/user-response.dto'].UserResponseDTO,
+              },
               created_at: { required: true, type: () => String },
             },
           },
@@ -364,6 +396,18 @@ export default async () => {
             UpdateProjectDTO: {
               title: { required: false, type: () => String },
               voice: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/users/dto/update-credits.dto'),
+          {
+            UpdateCreditsDTO: {
+              operation: {
+                required: true,
+                enum: t['./api/users/dto/update-credits.dto'].CreditOperation,
+              },
+              amount: { required: true, type: () => Number, minimum: 1 },
             },
           },
         ],
@@ -379,31 +423,20 @@ export default async () => {
           },
         ],
         [
-          import('./api/users/dto/user-response.dto'),
-          {
-            UserResponseDTO: {
-              _id: { required: true, type: () => String },
-              full_name: { required: true, type: () => String },
-              email: { required: true, type: () => String },
-              phone_number: { required: false, type: () => String },
-              role: {
-                required: true,
-                enum: t['./common/enums/role.enum'].UserRole,
-              },
-              status: {
-                required: true,
-                enum: t['./common/enums/status.enum'].EntityStatus,
-              },
-              created_at: { required: true, type: () => Date },
-              updated_at: { required: true, type: () => Date },
-            },
-          },
-        ],
-        [
           import('./api/subscription-plans/dto/credit.dto'),
           {
             PurchaseCreditDTO: {
               quantity: { required: true, type: () => Number },
+            },
+          },
+        ],
+        [
+          import('./api/projects/dto/admin-filter.dto'),
+          {
+            AdminProjectQueryDTO: {
+              type: { required: false, type: () => String },
+              status: { required: false, type: () => String },
+              user: { required: false, type: () => String },
             },
           },
         ],
@@ -475,6 +508,7 @@ export default async () => {
           {
             ProjectController: {
               getAll: {},
+              list: {},
               getEditorProjects: {},
               get: {},
               create: {},
@@ -488,7 +522,7 @@ export default async () => {
         ],
         [
           import('./api/users/users.controller'),
-          { UsersController: { list: {}, updateRole: {} } },
+          { UsersController: { list: {}, updateRole: {}, updateCredits: {} } },
         ],
       ],
     },

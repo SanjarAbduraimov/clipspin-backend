@@ -14,7 +14,7 @@ export class ProjectTypePriceDTO {
 
 export class SubscriptionPlanResponseDTO {
   @Expose()
-  @Transform(transform_object_id)
+  @Transform(transform_object_id())
   _id: string
 
   @Expose()
