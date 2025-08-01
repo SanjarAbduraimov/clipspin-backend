@@ -31,4 +31,3 @@ export class CreateHeygenVoiceDTO {
   @IsBoolean()
   support_locale: boolean
 }
-

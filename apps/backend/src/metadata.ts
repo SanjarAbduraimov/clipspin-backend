@@ -1,16 +1,496 @@
 /* eslint-disable */
 export default async () => {
-    const t = {
-        ["./api/auth/dto/google-auth.dto"]: await import("./api/auth/dto/google-auth.dto"),
-        ["./models/heygen-voice.schema"]: await import("./models/heygen-voice.schema"),
-        ["./models/project.schema"]: await import("./models/project.schema"),
-        ["./api/subscription-plans/dto/create.dto"]: await import("./api/subscription-plans/dto/create.dto"),
-        ["./api/subscription-plans/dto/response.dto"]: await import("./api/subscription-plans/dto/response.dto"),
-        ["./api/user-subscriptions/dto/response.dto"]: await import("./api/user-subscriptions/dto/response.dto"),
-        ["./api/projects/dto/response.dto"]: await import("./api/projects/dto/response.dto"),
-        ["./api/projects/dto/result.dto"]: await import("./api/projects/dto/result.dto"),
-        ["./common/enums/role.enum"]: await import("./common/enums/role.enum"),
-        ["./common/enums/status.enum"]: await import("./common/enums/status.enum")
-    };
-    return { "@nestjs/swagger": { "models": [[import("./api/auth/dto/google-auth.dto"), { "GoogleAuthDTO": { idToken: { required: true, type: () => String } }, "GoogleUserDTO": { email: { required: true, type: () => String }, firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, picture: { required: true, type: () => String } }, "GoogleAuthResponseDTO": { access_token: { required: true, type: () => String }, user: { required: true, type: () => t["./api/auth/dto/google-auth.dto"].GoogleUserDTO } } }], [import("./api/auth/dto/login.dto"), { "LoginDTO": { email: { required: true, type: () => String }, password: { required: true, type: () => String } } }], [import("./api/auth/dto/otp.dto"), { "SendOTPPhoneNumberDTO": { phone_number: { required: true, type: () => String } }, "SendOTPPhoneEmailDTO": { email: { required: true, type: () => String } }, "OTPResponseDTO": { code_hash: { required: true, type: () => String } } }], [import("./api/auth/dto/password-reset.dto"), { "ForgotPasswordDTO": { email: { required: true, type: () => String } }, "ResetPasswordDTO": { token: { required: true, type: () => String }, password: { required: true, type: () => String, minLength: 6 } }, "PasswordResetResponseDTO": { success: { required: true, type: () => Boolean }, message: { required: true, type: () => String } } }], [import("./api/auth/dto/singup.dto"), { "SignUpDTO": { full_name: { required: true, type: () => String }, email: { required: true, type: () => String }, password: { required: true, type: () => String }, phone_number: { required: true, type: () => String }, code: { required: true, type: () => Number }, code_hash: { required: true, type: () => String } }, "SignInResponseDTO": { access_token: { required: true, type: () => String } } }], [import("./api/credit-packs/dto/create.dto"), { "CreateCreditPackDTO": { name: { required: true, type: () => String }, description: { required: false, type: () => String }, price: { required: true, type: () => Number }, credits: { required: true, type: () => Number }, stripe_price_id: { required: false, type: () => String } } }], [import("./api/credit-packs/dto/response.dto"), { "CreditPackResponseDTO": { _id: { required: true, type: () => String }, name: { required: true, type: () => String }, description: { required: false, type: () => String }, price: { required: true, type: () => Number }, credits: { required: true, type: () => Number }, stripe_price_id: { required: false, type: () => String } } }], [import("./api/credit-packs/dto/update.dto"), { "UpdateCreditPackDTO": {} }], [import("./api/files/dto/response.dto"), { "FileUploadResponseDTO": { file_key: { required: true, type: () => String } } }], [import("./api/heygen-voices/dto/create.dto"), { "CreateHeygenVoiceDTO": { voice_id: { required: true, type: () => String }, language: { required: true, type: () => String }, gender: { required: true, enum: t["./models/heygen-voice.schema"].HeygenVoiceGender }, name: { required: true, type: () => String }, preview_audio: { required: true, type: () => String }, support_pause: { required: true, type: () => Boolean }, emotion_support: { required: true, type: () => Boolean }, support_interactive_avatar: { required: true, type: () => Boolean }, support_locale: { required: true, type: () => Boolean } } }], [import("./api/heygen-voices/dto/response.dto"), { "HeygenVoiceResponseDTO": { _id: { required: true, type: () => String }, voice_id: { required: true, type: () => String }, language: { required: true, type: () => String }, gender: { required: true, enum: t["./models/heygen-voice.schema"].HeygenVoiceGender }, name: { required: true, type: () => String }, preview_audio: { required: true, type: () => String }, support_pause: { required: true, type: () => Boolean }, emotion_support: { required: true, type: () => Boolean }, support_interactive_avatar: { required: true, type: () => Boolean }, support_locale: { required: true, type: () => Boolean }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } } }], [import("./api/heygen-voices/dto/update.dto"), { "UpdateHeygenVoiceDTO": {} }], [import("./api/subscription-plans/dto/create.dto"), { "ProjectTypePriceDTO": { project_type: { required: true, enum: t["./models/project.schema"].ProjectType }, credit_cost: { required: true, type: () => Number } }, "CreateSubscriptionPlanDTO": { name: { required: true, type: () => String }, description: { required: false, type: () => String }, price: { required: true, type: () => Number }, credits: { required: true, type: () => Number }, project_type_prices: { required: true, type: () => [t["./api/subscription-plans/dto/create.dto"].ProjectTypePriceDTO] }, stripe_price_id: { required: false, type: () => String } } }], [import("./api/subscription-plans/dto/response.dto"), { "ProjectTypePriceDTO": { project_type: { required: true, enum: t["./models/project.schema"].ProjectType }, credit_cost: { required: true, type: () => Number } }, "SubscriptionPlanResponseDTO": { _id: { required: true, type: () => String }, name: { required: true, type: () => String }, description: { required: false, type: () => String }, price: { required: true, type: () => Number }, credits: { required: true, type: () => Number }, project_type_prices: { required: true, type: () => [t["./api/subscription-plans/dto/response.dto"].ProjectTypePriceDTO] }, stripe_price_id: { required: false, type: () => String } } }], [import("./api/subscription-plans/dto/update.dto"), { "UpdateSubscriptionPlanDTO": {} }], [import("./api/user-subscriptions/dto/response.dto"), { "SubscriptionCreditsDTO": { total: { required: true, type: () => Number }, remaining: { required: true, type: () => Number } }, "UserSubscriptionResponseDTO": { _id: { required: true, type: () => String }, subscription_plan: { required: true, type: () => t["./api/subscription-plans/dto/response.dto"].SubscriptionPlanResponseDTO }, monthly_credits: { required: true, type: () => t["./api/user-subscriptions/dto/response.dto"].SubscriptionCreditsDTO }, purchased_credits: { required: true, type: () => t["./api/user-subscriptions/dto/response.dto"].SubscriptionCreditsDTO }, expires_at: { required: true, type: () => String }, created_at: { required: true, type: () => String } } }], [import("./api/profile/dto/response.dto"), { "ProfileResponseDTO": { _id: { required: true, type: () => String }, full_name: { required: true, type: () => String }, email: { required: true, type: () => String }, role: { required: true, type: () => String } } }], [import("./api/profile/dto/update.dto"), { "UpdateProfileDTO": { full_name: { required: true, type: () => String } } }], [import("./api/projects/dto/create.dto"), { "CreateProjectDTO": { title: { required: true, type: () => String }, type: { required: true, enum: t["./models/project.schema"].ProjectType }, voice: { required: false, type: () => String } } }], [import("./api/projects/dto/result.dto"), { "ProjectOutputDTO": { file_key: { required: false, type: () => String } } }], [import("./api/projects/dto/response.dto"), { "ProjectInputDTO": { url: { required: true, type: () => String }, source: { required: false, type: () => String }, file_key: { required: false, type: () => String } }, "ProjectIdeaDTO": { script: { required: false, type: () => String } }, "ProjectResponseDTO": { _id: { required: true, type: () => String }, title: { required: true, type: () => String }, type: { required: true, type: () => String }, input: { required: true, type: () => t["./api/projects/dto/response.dto"].ProjectInputDTO }, suggested_ideas: { required: true, type: () => t["./api/projects/dto/response.dto"].ProjectIdeaDTO }, selected_idea: { required: true, type: () => t["./api/projects/dto/response.dto"].ProjectIdeaDTO }, status: { required: true, type: () => String }, progress: { required: true, type: () => String }, output: { required: true, type: () => t["./api/projects/dto/result.dto"].ProjectOutputDTO }, error_cause: { required: true, type: () => String }, voice: { required: false, type: () => String }, created_at: { required: true, type: () => String } } }], [import("./api/projects/dto/update.dto"), { "UpdateProjectDTO": { title: { required: false, type: () => String }, voice: { required: false, type: () => String } } }], [import("./api/users/dto/update-role.dto"), { "UpdateRoleDTO": { role: { required: true, enum: t["./common/enums/role.enum"].UserRole } } }], [import("./api/users/dto/user-response.dto"), { "UserResponseDTO": { _id: { required: true, type: () => String }, full_name: { required: true, type: () => String }, email: { required: true, type: () => String }, phone_number: { required: false, type: () => String }, role: { required: true, enum: t["./common/enums/role.enum"].UserRole }, status: { required: true, enum: t["./common/enums/status.enum"].EntityStatus }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date } } }], [import("./api/subscription-plans/dto/credit.dto"), { "PurchaseCreditDTO": { quantity: { required: true, type: () => Number } } }]], "controllers": [[import("./api/auth/auth.controller"), { "AuthController": { "sendEmailOTP": {}, "signup": {}, "login": {}, "googleAuth": {}, "googleAuthCallback": {}, "forgotPassword": {}, "resetPassword": {} } }], [import("./api/credit-packs/credit-pack.controller"), { "CreditPackController": { "getAll": {}, "get": {}, "create_checkout_session": {}, "create": {}, "update": {}, "delete": {} } }], [import("./api/files/file.controller"), { "FileController": { "get_file": {}, "upload": {} } }], [import("./api/heygen-voices/heygen-voice.controller"), { "HeygenVoiceController": { "getAll": {}, "get": {}, "create": {}, "update": {}, "delete": {} } }], [import("./api/subscription-plans/subscription-plan.controller"), { "SubscriptionPlanController": { "getAll": {}, "get": {}, "create_checkout_session": {}, "create": {}, "update": {}, "delete": {}, "webhook": {} } }], [import("./api/profile/profile.controller"), { "ProfileController": { "get": {}, "update": {}, "get_subscriptions": {} } }], [import("./api/projects/project.controller"), { "ProjectController": { "getAll": {}, "getEditorProjects": {}, "get": {}, "create": {}, "generate": {}, "submit_result": {}, "update": {}, "delete": {}, "heygen_callback": {} } }], [import("./api/users/users.controller"), { "UsersController": { "list": {}, "updateRole": {} } }]] } };
-};
+  const t = {
+    ['./api/auth/dto/google-auth.dto']: await import(
+      './api/auth/dto/google-auth.dto'
+    ),
+    ['./models/heygen-voice.schema']: await import(
+      './models/heygen-voice.schema'
+    ),
+    ['./models/project.schema']: await import('./models/project.schema'),
+    ['./api/subscription-plans/dto/create.dto']: await import(
+      './api/subscription-plans/dto/create.dto'
+    ),
+    ['./api/subscription-plans/dto/response.dto']: await import(
+      './api/subscription-plans/dto/response.dto'
+    ),
+    ['./api/user-subscriptions/dto/response.dto']: await import(
+      './api/user-subscriptions/dto/response.dto'
+    ),
+    ['./api/projects/dto/response.dto']: await import(
+      './api/projects/dto/response.dto'
+    ),
+    ['./api/projects/dto/result.dto']: await import(
+      './api/projects/dto/result.dto'
+    ),
+    ['./common/enums/role.enum']: await import('./common/enums/role.enum'),
+    ['./common/enums/status.enum']: await import('./common/enums/status.enum'),
+  }
+  return {
+    '@nestjs/swagger': {
+      models: [
+        [
+          import('./api/auth/dto/google-auth.dto'),
+          {
+            GoogleAuthDTO: { idToken: { required: true, type: () => String } },
+            GoogleUserDTO: {
+              email: { required: true, type: () => String },
+              firstName: { required: true, type: () => String },
+              lastName: { required: true, type: () => String },
+              picture: { required: true, type: () => String },
+            },
+            GoogleAuthResponseDTO: {
+              access_token: { required: true, type: () => String },
+              user: {
+                required: true,
+                type: () => t['./api/auth/dto/google-auth.dto'].GoogleUserDTO,
+              },
+            },
+          },
+        ],
+        [
+          import('./api/auth/dto/login.dto'),
+          {
+            LoginDTO: {
+              email: { required: true, type: () => String },
+              password: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/auth/dto/otp.dto'),
+          {
+            SendOTPPhoneNumberDTO: {
+              phone_number: { required: true, type: () => String },
+            },
+            SendOTPPhoneEmailDTO: {
+              email: { required: true, type: () => String },
+            },
+            OTPResponseDTO: {
+              code_hash: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/auth/dto/password-reset.dto'),
+          {
+            ForgotPasswordDTO: {
+              email: { required: true, type: () => String },
+            },
+            ResetPasswordDTO: {
+              token: { required: true, type: () => String },
+              password: { required: true, type: () => String, minLength: 6 },
+            },
+            PasswordResetResponseDTO: {
+              success: { required: true, type: () => Boolean },
+              message: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/auth/dto/singup.dto'),
+          {
+            SignUpDTO: {
+              full_name: { required: true, type: () => String },
+              email: { required: true, type: () => String },
+              password: { required: true, type: () => String },
+              phone_number: { required: true, type: () => String },
+              code: { required: true, type: () => Number },
+              code_hash: { required: true, type: () => String },
+            },
+            SignInResponseDTO: {
+              access_token: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/credit-packs/dto/create.dto'),
+          {
+            CreateCreditPackDTO: {
+              name: { required: true, type: () => String },
+              description: { required: false, type: () => String },
+              price: { required: true, type: () => Number },
+              credits: { required: true, type: () => Number },
+              stripe_price_id: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/credit-packs/dto/response.dto'),
+          {
+            CreditPackResponseDTO: {
+              _id: { required: true, type: () => String },
+              name: { required: true, type: () => String },
+              description: { required: false, type: () => String },
+              price: { required: true, type: () => Number },
+              credits: { required: true, type: () => Number },
+              stripe_price_id: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/credit-packs/dto/update.dto'),
+          { UpdateCreditPackDTO: {} },
+        ],
+        [
+          import('./api/files/dto/response.dto'),
+          {
+            FileUploadResponseDTO: {
+              file_key: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/heygen-voices/dto/create.dto'),
+          {
+            CreateHeygenVoiceDTO: {
+              voice_id: { required: true, type: () => String },
+              language: { required: true, type: () => String },
+              gender: {
+                required: true,
+                enum: t['./models/heygen-voice.schema'].HeygenVoiceGender,
+              },
+              name: { required: true, type: () => String },
+              preview_audio: { required: true, type: () => String },
+              support_pause: { required: true, type: () => Boolean },
+              emotion_support: { required: true, type: () => Boolean },
+              support_interactive_avatar: {
+                required: true,
+                type: () => Boolean,
+              },
+              support_locale: { required: true, type: () => Boolean },
+            },
+          },
+        ],
+        [
+          import('./api/heygen-voices/dto/response.dto'),
+          {
+            HeygenVoiceResponseDTO: {
+              _id: { required: true, type: () => String },
+              voice_id: { required: true, type: () => String },
+              language: { required: true, type: () => String },
+              gender: {
+                required: true,
+                enum: t['./models/heygen-voice.schema'].HeygenVoiceGender,
+              },
+              name: { required: true, type: () => String },
+              preview_audio: { required: true, type: () => String },
+              support_pause: { required: true, type: () => Boolean },
+              emotion_support: { required: true, type: () => Boolean },
+              support_interactive_avatar: {
+                required: true,
+                type: () => Boolean,
+              },
+              support_locale: { required: true, type: () => Boolean },
+              createdAt: { required: true, type: () => Date },
+              updatedAt: { required: true, type: () => Date },
+            },
+          },
+        ],
+        [
+          import('./api/heygen-voices/dto/update.dto'),
+          { UpdateHeygenVoiceDTO: {} },
+        ],
+        [
+          import('./api/subscription-plans/dto/create.dto'),
+          {
+            ProjectTypePriceDTO: {
+              project_type: {
+                required: true,
+                enum: t['./models/project.schema'].ProjectType,
+              },
+              credit_cost: { required: true, type: () => Number },
+            },
+            CreateSubscriptionPlanDTO: {
+              name: { required: true, type: () => String },
+              description: { required: false, type: () => String },
+              price: { required: true, type: () => Number },
+              credits: { required: true, type: () => Number },
+              project_type_prices: {
+                required: true,
+                type: () => [
+                  t['./api/subscription-plans/dto/create.dto']
+                    .ProjectTypePriceDTO,
+                ],
+              },
+              stripe_price_id: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/subscription-plans/dto/response.dto'),
+          {
+            ProjectTypePriceDTO: {
+              project_type: {
+                required: true,
+                enum: t['./models/project.schema'].ProjectType,
+              },
+              credit_cost: { required: true, type: () => Number },
+            },
+            SubscriptionPlanResponseDTO: {
+              _id: { required: true, type: () => String },
+              name: { required: true, type: () => String },
+              description: { required: false, type: () => String },
+              price: { required: true, type: () => Number },
+              credits: { required: true, type: () => Number },
+              project_type_prices: {
+                required: true,
+                type: () => [
+                  t['./api/subscription-plans/dto/response.dto']
+                    .ProjectTypePriceDTO,
+                ],
+              },
+              stripe_price_id: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/subscription-plans/dto/update.dto'),
+          { UpdateSubscriptionPlanDTO: {} },
+        ],
+        [
+          import('./api/user-subscriptions/dto/response.dto'),
+          {
+            SubscriptionCreditsDTO: {
+              total: { required: true, type: () => Number },
+              remaining: { required: true, type: () => Number },
+            },
+            UserSubscriptionResponseDTO: {
+              _id: { required: true, type: () => String },
+              subscription_plan: {
+                required: true,
+                type: () =>
+                  t['./api/subscription-plans/dto/response.dto']
+                    .SubscriptionPlanResponseDTO,
+              },
+              monthly_credits: {
+                required: true,
+                type: () =>
+                  t['./api/user-subscriptions/dto/response.dto']
+                    .SubscriptionCreditsDTO,
+              },
+              purchased_credits: {
+                required: true,
+                type: () =>
+                  t['./api/user-subscriptions/dto/response.dto']
+                    .SubscriptionCreditsDTO,
+              },
+              expires_at: { required: true, type: () => String },
+              created_at: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/profile/dto/response.dto'),
+          {
+            ProfileResponseDTO: {
+              _id: { required: true, type: () => String },
+              full_name: { required: true, type: () => String },
+              email: { required: true, type: () => String },
+              role: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/profile/dto/update.dto'),
+          {
+            UpdateProfileDTO: {
+              full_name: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/projects/dto/create.dto'),
+          {
+            CreateProjectDTO: {
+              title: { required: true, type: () => String },
+              type: {
+                required: true,
+                enum: t['./models/project.schema'].ProjectType,
+              },
+              voice: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/projects/dto/result.dto'),
+          {
+            ProjectOutputDTO: {
+              file_key: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/projects/dto/response.dto'),
+          {
+            ProjectInputDTO: {
+              url: { required: true, type: () => String },
+              source: { required: false, type: () => String },
+              file_key: { required: false, type: () => String },
+            },
+            ProjectIdeaDTO: { script: { required: false, type: () => String } },
+            ProjectResponseDTO: {
+              _id: { required: true, type: () => String },
+              title: { required: true, type: () => String },
+              type: { required: true, type: () => String },
+              input: {
+                required: true,
+                type: () =>
+                  t['./api/projects/dto/response.dto'].ProjectInputDTO,
+              },
+              suggested_ideas: {
+                required: true,
+                type: () => t['./api/projects/dto/response.dto'].ProjectIdeaDTO,
+              },
+              selected_idea: {
+                required: true,
+                type: () => t['./api/projects/dto/response.dto'].ProjectIdeaDTO,
+              },
+              status: { required: true, type: () => String },
+              progress: { required: true, type: () => String },
+              output: {
+                required: true,
+                type: () => t['./api/projects/dto/result.dto'].ProjectOutputDTO,
+              },
+              error_cause: { required: true, type: () => String },
+              voice: { required: false, type: () => String },
+              created_at: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/projects/dto/update.dto'),
+          {
+            UpdateProjectDTO: {
+              title: { required: false, type: () => String },
+              voice: { required: false, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./api/users/dto/update-role.dto'),
+          {
+            UpdateRoleDTO: {
+              role: {
+                required: true,
+                enum: t['./common/enums/role.enum'].UserRole,
+              },
+            },
+          },
+        ],
+        [
+          import('./api/users/dto/user-response.dto'),
+          {
+            UserResponseDTO: {
+              _id: { required: true, type: () => String },
+              full_name: { required: true, type: () => String },
+              email: { required: true, type: () => String },
+              phone_number: { required: false, type: () => String },
+              role: {
+                required: true,
+                enum: t['./common/enums/role.enum'].UserRole,
+              },
+              status: {
+                required: true,
+                enum: t['./common/enums/status.enum'].EntityStatus,
+              },
+              created_at: { required: true, type: () => Date },
+              updated_at: { required: true, type: () => Date },
+            },
+          },
+        ],
+        [
+          import('./api/subscription-plans/dto/credit.dto'),
+          {
+            PurchaseCreditDTO: {
+              quantity: { required: true, type: () => Number },
+            },
+          },
+        ],
+      ],
+      controllers: [
+        [
+          import('./api/auth/auth.controller'),
+          {
+            AuthController: {
+              sendEmailOTP: {},
+              signup: {},
+              login: {},
+              googleAuth: {},
+              googleAuthCallback: {},
+              forgotPassword: {},
+              resetPassword: {},
+            },
+          },
+        ],
+        [
+          import('./api/credit-packs/credit-pack.controller'),
+          {
+            CreditPackController: {
+              getAll: {},
+              get: {},
+              create_checkout_session: {},
+              create: {},
+              update: {},
+              delete: {},
+            },
+          },
+        ],
+        [
+          import('./api/files/file.controller'),
+          { FileController: { get_file: {}, upload: {} } },
+        ],
+        [
+          import('./api/heygen-voices/heygen-voice.controller'),
+          {
+            HeygenVoiceController: {
+              getAll: {},
+              get: {},
+              create: {},
+              update: {},
+              delete: {},
+            },
+          },
+        ],
+        [
+          import('./api/subscription-plans/subscription-plan.controller'),
+          {
+            SubscriptionPlanController: {
+              getAll: {},
+              get: {},
+              create_checkout_session: {},
+              create: {},
+              update: {},
+              delete: {},
+              webhook: {},
+            },
+          },
+        ],
+        [
+          import('./api/profile/profile.controller'),
+          { ProfileController: { get: {}, update: {}, get_subscriptions: {} } },
+        ],
+        [
+          import('./api/projects/project.controller'),
+          {
+            ProjectController: {
+              getAll: {},
+              getEditorProjects: {},
+              get: {},
+              create: {},
+              generate: {},
+              submit_result: {},
+              update: {},
+              delete: {},
+              heygen_callback: {},
+            },
+          },
+        ],
+        [
+          import('./api/users/users.controller'),
+          { UsersController: { list: {}, updateRole: {} } },
+        ],
+      ],
+    },
+  }
+}

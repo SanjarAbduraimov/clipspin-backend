@@ -41,4 +41,3 @@ export class HeygenVoiceResponseDTO {
   @Expose()
   updatedAt: Date
 }
-

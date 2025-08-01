@@ -48,4 +48,3 @@ export class HeygenVoice {
 }
 
 export const HeygenVoiceSchema = SchemaFactory.createForClass(HeygenVoice)
-

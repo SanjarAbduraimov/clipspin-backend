@@ -14,4 +14,3 @@ export class HeygenVoiceService extends BaseService<HeygenVoice> {
     super(heygen_voice_model)
   }
 }
-

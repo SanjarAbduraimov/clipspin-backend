@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer'
-import { IsMongoId, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator'
+import {
+  IsMongoId,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator'
 
 class ProjectIdeaDTO {
   @IsString()
