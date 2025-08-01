@@ -10,8 +10,11 @@ import { AllowedRoles } from '../../common/decarators/role.decarator'
 import { User } from '../../common/decarators/user.decarator'
 import { UserRole } from '../../common/enums/role.enum'
 import { NotFoundError } from '../../common/errors/not-fount.error'
+import { HeygenVoiceDocument } from '../../models/heygen-voice.schema'
 import { ProjectStatus, ProjectType } from '../../models/project.schema'
 import { UserDocument } from '../../models/user.schema'
+import { HeygenVoiceController } from '../heygen-voices/heygen-voice.controller'
+import { HeygenVoiceService } from '../heygen-voices/heygen-voice.service'
 import { SubscriptionPlanController } from '../subscription-plans/subscription-plan.controller'
 import { SubscriptionPlanService } from '../subscription-plans/subscription-plan.service'
 import { UserSubscriptionController } from '../user-subscriptions/user-subscription.controller'
@@ -31,6 +34,7 @@ export class ProjectController {
     private readonly project_service: ProjectService,
     private readonly user_subscription_service: UserSubscriptionService,
     private readonly subscription_plan_service: SubscriptionPlanService,
+    private readonly heygen_voice_service: HeygenVoiceService,
     private readonly queue: MainQueue,
   ) {}
 
@@ -82,6 +86,18 @@ export class ProjectController {
     @GetContext() ctx: Context,
     @User() user: UserDocument,
   ) {
+    let voice: HeygenVoiceDocument
+
+    if (body.voice) {
+      voice = await this.heygen_voice_service.retrieve(body.voice)
+
+      if (!voice) {
+        throw new NotFoundError(HeygenVoiceController.resource_name, {
+          id: body.voice,
+        })
+      }
+    }
+
     const user_subscription = await this.user_subscription_service.find({
       user: user._id,
     })
@@ -133,10 +149,9 @@ export class ProjectController {
       credit_usage,
     )
 
-    user
-
     const project = await this.project_service.create({
       ...body,
+      voice: voice?._id,
       user: ctx.user?._id,
       credit_usage,
     })
@@ -197,6 +212,18 @@ export class ProjectController {
     @Param('id') id: string,
     @Body() body: UpdateProjectDTO,
   ) {
+    let voice: HeygenVoiceDocument
+
+    if (body.voice) {
+      voice = await this.heygen_voice_service.retrieve(body.voice)
+
+      if (!voice) {
+        throw new NotFoundError(HeygenVoiceController.resource_name, {
+          id: body.voice,
+        })
+      }
+    }
+
     let project = await this.project_service.find(
       { _id: id, user: ctx.user._id },
       ctx,
@@ -208,7 +235,14 @@ export class ProjectController {
       })
     }
 
-    project = await this.project_service.update(id, body, ctx)
+    project = await this.project_service.update(
+      id,
+      {
+        ...body,
+        voice: voice._id,
+      },
+      ctx,
+    )
 
     return { data: project }
   }

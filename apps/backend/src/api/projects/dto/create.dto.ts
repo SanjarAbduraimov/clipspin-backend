@@ -1,7 +1,9 @@
 import { Expose, Type } from 'class-transformer'
 import {
   IsEnum,
+  IsMongoId,
   IsObject,
+  IsOptional,
   IsString,
   IsUrl,
   ValidateNested,
@@ -28,4 +30,8 @@ export class CreateProjectDTO {
   @IsEnum(ProjectType)
   @IsString()
   type: ProjectType
+
+  @IsOptional()
+  @IsMongoId()
+  voice?: string
 }

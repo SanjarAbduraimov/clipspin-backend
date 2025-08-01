@@ -22,10 +22,12 @@ export class HeygenService {
   async generate_video({
     script,
     callback_id,
+    voice_id,
   }: {
     title: string
     script: string
     callback_id: string
+    voice_id: string
   }): Promise<any> {
     try {
       const response = await this.client.post(
@@ -39,6 +41,13 @@ export class HeygenService {
               type: 'text',
               properties: {
                 content: script,
+              },
+            },
+            script_voice: {
+              name: 'script_voice',
+              type: 'voice',
+              properties: {
+                voice_id,
               },
             },
           },

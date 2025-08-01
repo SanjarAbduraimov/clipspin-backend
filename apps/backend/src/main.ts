@@ -6,6 +6,7 @@ import basicAuth from 'express-basic-auth'
 
 import { AppModule } from './app.module'
 import { TransformResponseInterceptor } from './common/interceptors/response.interceptor'
+import metadata from './metadata'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -42,6 +43,7 @@ async function bootstrap() {
     .addBearerAuth()
     .build()
 
+  await SwaggerModule.loadPluginMetadata(metadata)
   const document = SwaggerModule.createDocument(app, swagger_config)
   SwaggerModule.setup('api/docs', app, document)
 

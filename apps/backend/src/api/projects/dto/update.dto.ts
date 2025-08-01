@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer'
-import { IsObject, IsOptional, IsString, ValidateNested } from 'class-validator'
+import { IsMongoId, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator'
 
 class ProjectIdeaDTO {
   @IsString()
@@ -16,4 +16,8 @@ export class UpdateProjectDTO {
   @Type(() => ProjectIdeaDTO)
   @ValidateNested()
   selected_idea?: ProjectIdeaDTO
+
+  @IsOptional()
+  @IsMongoId()
+  voice?: string
 }

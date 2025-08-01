@@ -173,6 +173,9 @@ export class Project {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: Types.ObjectId
 
+  @Prop({ type: Types.ObjectId, ref: 'HeygenVoice' })
+  voice?: Types.ObjectId
+
   @Prop({
     type: String,
     enum: ProjectStatus,

@@ -57,5 +57,9 @@ export class ProjectResponseDTO {
   error_cause: string
 
   @Expose()
+  @Transform(transform_object_id)
+  voice?: string
+
+  @Expose()
   created_at: string
 }

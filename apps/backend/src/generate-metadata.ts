@@ -8,5 +8,5 @@ generator.generate({
   ],
   outputDir: __dirname,
   watch: true,
-  tsconfigPath: 'apps/<name>/tsconfig.app.json',
+  tsconfigPath: 'apps/backend/tsconfig.app.json',
 })

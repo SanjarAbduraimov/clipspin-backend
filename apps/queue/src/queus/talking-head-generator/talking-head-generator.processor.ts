@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { ApifyClient } from 'apify-client'
 import { Job } from 'bull'
 
+import { HeygenVoiceDocument } from 'apps/backend/src/models/heygen-voice.schema'
 import { ProjectProgress } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
@@ -73,16 +74,21 @@ export class TalkingHeadGeneratorQueueProcessor {
 
   @Process(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_VIDEO)
   async generate_video(job: Job<GenerateTalkingHeadData>) {
-    const project = await this.project_service.retrieve(job.data.project_id)
+    const project = await this.project_service.retrieve(job.data.project_id, {
+      populate: 'voice',
+    })
 
     await this.project_service.update(project._id, {
       progress: ProjectProgress.GENERATING_VIDEO,
     })
 
+    const voice = project.voice as unknown as HeygenVoiceDocument
+
     const video = await this.heygen_service.generate_video({
       script: project.talking_head_data.script,
       title: project.talking_head_data.title,
       callback_id: project._id.toString(),
+      voice_id: voice.voice_id,
     })
 
     await this.project_service.update(job.data.project_id, {
