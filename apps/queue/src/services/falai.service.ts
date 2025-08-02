@@ -2,6 +2,8 @@ import { FalClient, createFalClient } from '@fal-ai/client'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
+import { ProjectErrorCause } from 'apps/backend/src/models/project.schema'
+
 @Injectable()
 export class FalAIService {
   client: FalClient
@@ -16,12 +18,10 @@ export class FalAIService {
 
   async generate_image({ prompt }: { prompt: string }) {
     try {
-      const response = await this.client.run('fal-ai/flux/dev', {
+      const response = await this.client.run('fal-ai/flux-pro/v1.1', {
         input: {
           prompt: prompt,
           image_size: 'portrait_16_9',
-          num_inference_steps: 28,
-          guidance_scale: 3.5,
           num_images: 1,
           enable_safety_checker: true,
         },
