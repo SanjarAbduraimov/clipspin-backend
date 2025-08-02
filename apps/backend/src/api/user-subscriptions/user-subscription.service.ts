@@ -83,18 +83,16 @@ export class UserSubscriptionService extends BaseService<UserSubscription> {
     return true
   }
 
-  async add_purchased_credits(user_id: Types.ObjectId, amount: number) {
-    const user_subscription = await this.find({ user: user_id })
-
-    await this.user_subscription_model.findByIdAndUpdate(
-      user_subscription._id,
-      {
-        $inc: {
-          'purchased_credits.total': amount,
-          'purchased_credits.remaining': amount,
-        },
+  async add_purchased_credits(
+    user_subscription_id: Types.ObjectId,
+    amount: number,
+  ) {
+    await this.user_subscription_model.findByIdAndUpdate(user_subscription_id, {
+      $inc: {
+        'purchased_credits.total': amount,
+        'purchased_credits.remaining': amount,
       },
-    )
+    })
   }
 
   async decrement_credits(

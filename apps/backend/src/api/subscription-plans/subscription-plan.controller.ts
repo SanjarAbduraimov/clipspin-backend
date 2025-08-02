@@ -192,8 +192,16 @@ export class SubscriptionPlanController {
         const credit_pack =
           await this.credit_pack_service.retrieve(credit_pack_id)
 
+        const user_subscription = await this.user_subscription_service.find({
+          user: user._id,
+        })
+
+        if (!user_subscription) {
+          throw new Error('User subscription not found')
+        }
+
         await this.user_subscription_service.add_purchased_credits(
-          user._id,
+          user_subscription._id,
           credit_pack.credits,
         )
       }
