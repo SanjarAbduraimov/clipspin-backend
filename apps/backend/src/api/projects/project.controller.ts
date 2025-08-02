@@ -252,7 +252,7 @@ export class ProjectController {
       id,
       {
         ...body,
-        voice: voice._id,
+        voice: voice?._id,
       },
       ctx,
     )
