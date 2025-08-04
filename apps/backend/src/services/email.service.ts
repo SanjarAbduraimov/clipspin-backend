@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Resend } from 'resend'
+import { CreateEmailOptions, Resend } from 'resend'
 
 @Injectable()
 export class EmailService {
@@ -18,15 +18,19 @@ export class EmailService {
     subject,
     text,
     email,
-    idempotencyKey,
+    idempotency_key,
+    display_name,
   }: {
     subject: string
     text: string
     email: string
-    idempotencyKey?: string
+    idempotency_key?: string
+    display_name?: string
   }) {
-    const payload = {
-      from: this.from,
+    const from = display_name ? `${display_name} <${this.from}>` : this.from
+
+    const payload: CreateEmailOptions = {
+      from,
       to: [email],
       text,
       subject,
@@ -34,9 +38,9 @@ export class EmailService {
 
     const result = await this.client.emails.send(
       payload,
-      idempotencyKey
+      idempotency_key
         ? {
-            idempotencyKey,
+            idempotencyKey: idempotency_key,
           }
         : undefined,
     )

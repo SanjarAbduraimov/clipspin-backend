@@ -66,6 +66,7 @@ export class AuthController {
         email,
         text: `Your verification code: ${code}`,
         subject: 'verification code',
+        display_name: 'ClipSpin Support',
       })
     } catch (error) {
       console.log(error)
@@ -188,6 +189,7 @@ export class AuthController {
         email,
         subject: 'Password Reset',
         text: `You requested a password reset. Please click on the link below to reset your password:\n\n${reset_url}\n\nIf you didn't request this, please ignore this email.`,
+        display_name: 'ClipSpin Support',
       })
 
       return {
