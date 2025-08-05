@@ -32,4 +32,22 @@ export class FalAIService {
       throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCENES)
     }
   }
+  async generate_video({ prompt }: { prompt: string }) {
+    try {
+      const response = await this.client.subscribe('fal-ai/veo3', {
+        input: {
+          prompt,
+          logs: true,
+          onQueueUpdate: (update: { status: string; logs: any[] }) => {
+            if (update.status === 'IN_PROGRESS') {
+              update.logs.map((log) => log.message).forEach(console.log)
+            }
+          },
+        },
+      })
+      return response.data.video
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_VIDEO)
+    }
+  }
 }

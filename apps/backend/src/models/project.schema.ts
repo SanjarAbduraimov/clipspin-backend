@@ -9,6 +9,7 @@ export enum ProjectType {
   SLIDE_SHOW = 'slide_show',
   TEXT_AUDIOGRAM = 'text_audiogram',
   TALKING_HEAD = 'talking_head',
+  VEO3 = 'veo3', // will be used for future video generating projects
   PROFESSIONAL = 'professional',
 }
 
@@ -99,6 +100,13 @@ export class TalkingHeadData {
   @Prop()
   script?: string
 }
+export class Veo3Data {
+  @Prop()
+  title?: string
+
+  @Prop()
+  script?: string
+}
 
 export class ProjectOutput {
   @Prop()
@@ -169,6 +177,9 @@ export class Project {
 
   @Prop({ type: TalkingHeadData })
   talking_head_data?: TalkingHeadData
+
+  @Prop({ type: Veo3Data })
+  veo3_data?: Veo3Data
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: Types.ObjectId

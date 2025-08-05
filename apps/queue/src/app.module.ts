@@ -15,6 +15,7 @@ import { OutputQueueModule } from './queus/output/output.module'
 import { SlideGeneratorQueueModule } from './queus/slide-show-generator/slide-show-generator.module'
 import { TalkingHeadGeneratorQueueModule } from './queus/talking-head-generator/talking-head-generator.module'
 import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-generator/text-audiogram-generator.module'
+import { Veo3GeneratorQueueModule } from './queus/veo3-generator/veo3-generator.module'
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { TextAudiogramGeneratorQueueModule } from './queus/text-audiogram-genera
       },
       inject: [ConfigService],
     }),
+    Veo3GeneratorQueueModule,
     TalkingHeadGeneratorQueueModule,
     TextAudiogramGeneratorQueueModule,
     SlideGeneratorQueueModule,

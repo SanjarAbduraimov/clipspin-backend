@@ -27,6 +27,10 @@ const talking_head_script_schema = z.object({
   title: z.string(),
   script: z.string(),
 })
+const veo3_script_schema = z.object({
+  title: z.string(),
+  script: z.string(),
+})
 
 @Injectable()
 export class OpenAIService {
@@ -300,6 +304,55 @@ Video scripts: ${description}
         ],
         text: {
           format: zodTextFormat(talking_head_script_schema, 'script'),
+        },
+      })
+
+      return response.output_parsed
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCRIPTS)
+    }
+  }
+  async generate_veo3_script({ description }: { description: string }) {
+    try {
+      const system_prompt = `
+      You are a specialized AI agent engineered to create optimized prompts for fal-ai/veo3 video generation, designed for short-form videos on TikTok, YouTube Shorts, and Instagram Reels. Your goal is to produce vivid, concise prompts (100-150 words) that maximize visual and audio impact for engaging videos. Each prompt must include:
+
+      - **Subject**: The main character, object, or focus.
+      - **Context**: The setting or environment.
+      - **Action**: Specific events or movements.
+      - **Style**: Visual aesthetic (e.g., cinematic, surreal, vibrant).
+      - **Camera Motion**: How the camera moves (e.g., tracking, zoom, static).
+      - **Composition**: Shot framing (e.g., wide, close-up).
+      - **Ambiance**: Mood, lighting, and audio elements (e.g., sound effects, music).
+      - **Timing**: Dynamic transitions or pacing (e.g., "sudden zoom," "gradual fade").
+
+      ### Output Requirements
+      - Output a single plain-text paragraph, no markdown or formatting.
+      - Keep it 100-150 words for 8-15 second videos.
+      - Include vivid visual details and synchronized audio (e.g., sound effects, ambient noise).
+      - Use active voice and present tense for immediacy.
+      - Ensure platform-optimized engagement with a hook (e.g., "Watch this!" or a surprising action).
+      - Avoid vague terms, medical claims, or overly complex jargon.
+
+      ### Example Output
+      A dynamic first-person shot of a skateboarder weaving through a bustling urban street at sunset, with vibrant orange and pink skies reflecting off glass buildings. The skateboarder performs a smooth ollie over a curb, with the camera following closely, capturing the rhythmic clack of wheels on pavement. The style is gritty, cinematic, with a slight grainy texture. Ambient sounds include distant car horns, crowd chatter, and a lo-fi hip-hop beat. The scene transitions to a slow-motion close-up of the skateboarder’s sneakers landing on the board, with a satisfying thud.
+      `
+      const response = await this.client.responses.parse({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content: system_prompt,
+          },
+          {
+            role: 'user',
+            content: `
+Video scripts: ${description}
+`,
+          },
+        ],
+        text: {
+          format: zodTextFormat(veo3_script_schema, 'script'),
         },
       })
 

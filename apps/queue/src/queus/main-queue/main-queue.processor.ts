@@ -13,6 +13,7 @@ import { OutputQueue, OutputQueueData } from '../output/output.queue'
 import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
 import { TalkingHeadGeneratorQueue } from '../talking-head-generator/talking-head-generator.queue'
 import { TextAudiogramGeneratorQueue } from '../text-audiogram-generator/text-audiogram-generator.queue'
+import { Veo3GeneratorQueue } from '../veo3-generator/veo3-generator.queue'
 import {
   MAIN_QUEUE_EVENTS,
   MAIN_QUEUE_NAME,
@@ -27,8 +28,8 @@ export class MainQueueProcessor {
     private readonly project_service: ProjectService,
     private readonly text_audiogram_generator_queue: TextAudiogramGeneratorQueue,
     private readonly talking_head_generator_queue: TalkingHeadGeneratorQueue,
+    private readonly veo3_generator_queue: Veo3GeneratorQueue,
     private readonly output_queue: OutputQueue,
-    private readonly test_queue: TalkingHeadGeneratorQueue,
   ) {}
 
   @OnQueueActive()
@@ -74,6 +75,11 @@ export class MainQueueProcessor {
 
         case ProjectType.TALKING_HEAD:
           this.talking_head_generator_queue.generate({
+            project_id: project.id,
+          })
+          break
+        case ProjectType.VEO3:
+          this.veo3_generator_queue.generate({
             project_id: project.id,
           })
           break

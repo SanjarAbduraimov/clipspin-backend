@@ -100,6 +100,7 @@ export class ProjectController {
     @User() user: UserDocument,
   ) {
     let voice: HeygenVoiceDocument
+    console.log(body, 'body')
 
     if (body.voice) {
       voice = await this.heygen_voice_service.retrieve(body.voice)
