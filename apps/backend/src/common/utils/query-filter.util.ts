@@ -1,24 +1,27 @@
 import { Types } from 'mongoose'
 
+const reserved_operators = ['_page', '_limit', '_sort', '_populate', '_select']
+
 export class QueryFilterUtil {
   static convertToMongoFilter(queryDto: any): any {
     const mongo_filter: any = {}
 
     for (const [key, value] of Object.entries(queryDto)) {
+      if (this.is_reserved_operator(key)) {
+        continue
+      }
+
       if (value === undefined || value === null) {
         continue
       }
 
-      // Check if the value is already a MongoDB operator object (e.g., {$in: [...], $gte: ...})
       if (
         typeof value === 'object' &&
         !Array.isArray(value) &&
         value !== null
       ) {
         mongo_filter[key] = this.processOperatorObject(value)
-      }
-      // Handle bracket notation for backwards compatibility
-      else {
+      } else {
         const bracket_match = key.match(/^(.+)\[\$(.+)\](\[\])?$/)
         if (bracket_match) {
           const [, field, operator, is_array] = bracket_match
@@ -28,7 +31,7 @@ export class QueryFilterUtil {
           }
 
           const mongo_operator = `$${operator}`
-          let processed_value
+          let processed_value: any
 
           if (is_array || operator === 'in' || operator === 'nin') {
             processed_value = Array.isArray(value)
@@ -48,7 +51,6 @@ export class QueryFilterUtil {
             mongo_filter[field][mongo_operator] = processed_value
           }
         } else {
-          // Direct field match
           mongo_filter[key] = this.convertValue(value)
         }
       }
@@ -63,7 +65,6 @@ export class QueryFilterUtil {
     for (const [operator, value] of Object.entries(operatorObj)) {
       if (operator.startsWith('$')) {
         if (operator === '$in' || operator === '$nin') {
-          // Handle array operators
           result[operator] = Array.isArray(value)
             ? (value as any[]).map((v) => this.convertValue(v))
             : [this.convertValue(value)]
@@ -73,7 +74,6 @@ export class QueryFilterUtil {
           result[operator] = value
           result['$options'] = 'i'
         } else {
-          // Handle other operators like $gte, $lte, $ne, etc.
           result[operator] = this.convertValue(value)
         }
       }
@@ -84,7 +84,6 @@ export class QueryFilterUtil {
 
   private static convertValue(value: any): any {
     if (typeof value === 'string') {
-      // Check if it's a MongoDB ObjectId using Mongoose's built-in validation
       if (Types.ObjectId.isValid(value)) {
         try {
           return new Types.ObjectId(value)
@@ -93,12 +92,15 @@ export class QueryFilterUtil {
         }
       }
 
-      // Check if it's a date string
       const date_value = new Date(value)
       if (!isNaN(date_value.getTime()) && value.match(/^\d{4}-\d{2}-\d{2}/)) {
         return date_value
       }
     }
     return value
+  }
+
+  private static is_reserved_operator(key: string): boolean {
+    return reserved_operators.includes(key)
   }
 }
