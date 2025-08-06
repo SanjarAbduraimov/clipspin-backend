@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger'
 
 import { MainQueue } from 'apps/queue/src/queus/main-queue/main-queue.queue'
 
@@ -52,9 +52,13 @@ export class ProjectController {
     return { data: projects, total }
   }
 
+  @Public()
   @Get('/list')
   @AllowedRoles(UserRole.ADMIN)
   @ResponseDTO(ProjectResponseDTO)
+  @ApiQuery({ name: '_limit', type: Number, required: false, example: 10 })
+  @ApiQuery({ name: '_page', type: Number, required: false, example: 1 })
+  @ApiQuery({ name: '_skip', type: Number, required: false, example: 0 })
   async list(@GetContext() ctx: Context, @QueryFilter() filter: any) {
     const { data: projects, total } = await this.project_service.list(filter, {
       ...ctx,
