@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
 
+import { EntityStatus } from '../common/enums/status.enum'
 import { COLLECTION_TIMESTAMPS } from '../constants'
 
 export type HeygenVoiceDocument = HydratedDocument<HeygenVoice>
@@ -45,6 +46,16 @@ export class HeygenVoice {
 
   @Prop({ required: true })
   support_locale: boolean
+
+  @Prop({
+    type: String,
+    enum: EntityStatus,
+    default: EntityStatus.ACTIVE,
+  })
+  status: EntityStatus = EntityStatus.ACTIVE
+
+  @Prop()
+  deleted_at?: Date
 }
 
 export const HeygenVoiceSchema = SchemaFactory.createForClass(HeygenVoice)

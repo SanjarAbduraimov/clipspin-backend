@@ -5,6 +5,7 @@ import { Context, GetContext } from '../../common/decarators/context.decarator'
 import { ResponseDTO } from '../../common/decarators/response.decarator'
 import { AllowedRoles } from '../../common/decarators/role.decarator'
 import { UserRole } from '../../common/enums/role.enum'
+import { EntityStatus } from '../../common/enums/status.enum'
 import { NotFoundError } from '../../common/errors/not-fount.error'
 import { CreateHeygenVoiceDTO } from './dto/create.dto'
 import { HeygenVoiceResponseDTO } from './dto/response.dto'
@@ -23,7 +24,9 @@ export class HeygenVoiceController {
   @ResponseDTO(HeygenVoiceResponseDTO)
   async getAll(@GetContext() ctx: Context) {
     const { data: heygen_voices, total } = await this.heygen_voice_service.list(
-      {},
+      {
+        status: EntityStatus.ACTIVE,
+      },
       ctx,
     )
 
