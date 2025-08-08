@@ -327,6 +327,7 @@ Video scripts: ${description}
       - **Timing**: Dynamic transitions or pacing (e.g., "sudden zoom," "gradual fade").
 
       ### Output Requirements
+      - Video must be in vertical 9:16 aspect ratio, optimized for TikTok, YouTube Shorts, and Instagram Reels.
       - Output a single plain-text paragraph, no markdown or formatting.
       - Keep it 100-150 words for 8-15 second videos.
       - Include vivid visual details and synchronized audio (e.g., sound effects, ambient noise).
