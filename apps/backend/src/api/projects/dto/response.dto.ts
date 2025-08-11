@@ -55,6 +55,12 @@ export class ProjectResponseDTO {
   output: ProjectOutputDTO
 
   @Expose()
+  optimized_copy?: string
+
+  @Expose()
+  hashtags?: string
+
+  @Expose()
   error_cause: string
 
   @Expose()

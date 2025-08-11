@@ -8,6 +8,7 @@ import { R2Service } from 'apps/backend/src/services/r2.service'
 import configuration from 'apps/backend/src/config'
 
 import { AnalyzeVideoQueueModule } from './queus/analyze-video/analyze-video.module'
+import { ContentGeneratorQueueModule } from './queus/content-generator/content-generator.module'
 import { InputVideoParserQueueModule } from './queus/input-video-parser/input-video-parser.module'
 import { MainQueueModule } from './queus/main-queue/main-queue.module'
 import { MainQueueProcessor } from './queus/main-queue/main-queue.processor'
@@ -57,6 +58,7 @@ import { Veo3GeneratorQueueModule } from './queus/veo3-generator/veo3-generator.
     InputVideoParserQueueModule,
     OutputQueueModule,
     MainQueueModule,
+    ContentGeneratorQueueModule,
   ],
   providers: [MainQueueProcessor, R2Service],
 })

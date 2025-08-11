@@ -55,6 +55,7 @@ export enum ProjectErrorCause {
   FAILED_TO_PARSE = 'failed_to_parse',
   FAILED_TO_ANALYZE = 'failed_to_analyze',
   FAILED_TO_GENERATE_VIDEO = 'failed_to_generate_video',
+  FAILED_TO_GENERATE_CONTENT = 'failed_to_generate_content',
   FAILED_TO_GENERATE_SCENES = 'failed_to_generate_scenes',
   FAILED_TO_GENERATE_SCRIPTS = 'failed_to_generate_scripts',
   UNKNOWN_ERROR = 'unknown_error',
@@ -180,6 +181,12 @@ export class Project {
 
   @Prop({ type: Veo3Data })
   veo3_data?: Veo3Data
+
+  @Prop()
+  hashtags?: string
+
+  @Prop()
+  optimized_copy?: string
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: Types.ObjectId

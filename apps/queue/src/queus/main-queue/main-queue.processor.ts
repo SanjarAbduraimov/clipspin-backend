@@ -8,6 +8,7 @@ import {
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
+import { ContentGeneratorQueue } from '../content-generator/content-generator.queue'
 import { InputVideoParserQueue } from '../input-video-parser/input-video-parser.queue'
 import { OutputQueue, OutputQueueData } from '../output/output.queue'
 import { SlideGeneratorQueue } from '../slide-show-generator/slide-show-generator.queue'
@@ -30,6 +31,7 @@ export class MainQueueProcessor {
     private readonly talking_head_generator_queue: TalkingHeadGeneratorQueue,
     private readonly veo3_generator_queue: Veo3GeneratorQueue,
     private readonly output_queue: OutputQueue,
+    private readonly content_generator_queue: ContentGeneratorQueue,
   ) {}
 
   @OnQueueActive()
@@ -95,5 +97,21 @@ export class MainQueueProcessor {
   @Process(MAIN_QUEUE_EVENTS.OUTPUT)
   async output(job: Job<OutputQueueData>) {
     this.output_queue.save(job.data)
+  }
+
+  @Process(MAIN_QUEUE_EVENTS.GENERATE_CONTENT)
+  async generate_content(job: Job<MainQueueData>) {
+    try {
+      this.content_generator_queue.generate_all({
+        project_id: job.data.project_id,
+        content_type: 'all',
+      })
+    } catch (error) {
+      console.error(
+        `Failed to generate content for project ${job.data.project_id}:`,
+        error,
+      )
+      new Error(ProjectErrorCause.FAILED_TO_GENERATE_CONTENT)
+    }
   }
 }

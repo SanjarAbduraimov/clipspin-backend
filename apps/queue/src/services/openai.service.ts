@@ -32,6 +32,14 @@ const veo3_script_schema = z.object({
   script: z.string(),
 })
 
+const hashtag_schema = z.object({
+  hashtags: z.string(),
+})
+
+const optimized_copy_schema = z.object({
+  copy: z.string(),
+})
+
 @Injectable()
 export class OpenAIService {
   client: OpenAI
@@ -360,6 +368,107 @@ Video scripts: ${description}
       return response.output_parsed
     } catch (error) {
       throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCRIPTS)
+    }
+  }
+
+  async generate_hashtags({ description }: { description: string }) {
+    try {
+      const response = await this.client.responses.parse({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content: `You are an expert social media hashtag strategist specializing in short-form video content.
+
+Your task is to generate highly effective, trending-aware hashtags that maximize discoverability and engagement based on video content.
+
+## Output Requirements
+- Generate 15-25 relevant hashtags as a single string
+- Mix popular trending hashtags with niche-specific tags
+- Include hashtags of varying popularity levels (viral, medium, niche)
+- Separate each hashtag with a space
+- Ensure all hashtags are currently relevant and not outdated
+
+## Hashtag Strategy Guidelines
+- **Popular hashtags** (1M+ posts): Use 3-5 for broad reach
+- **Medium hashtags** (100K-1M posts): Use 8-12 for targeted reach  
+- **Niche hashtags** (10K-100K posts): Use 7-10 for engaged communities
+
+## Critical Instructions
+- Return only valid JSON in the specified format
+- All hashtags must start with # symbol
+- Return hashtags as a single space-separated string
+- No explanations, markdown, or additional text
+- Hashtags should be relevant to the content provided
+- Avoid banned, inappropriate, or irrelevant hashtags
+
+Example output format: "#viral #trending #shorts #fyp #content #amazing #video #social #media #engagement #discovery"`,
+          },
+          {
+            role: 'user',
+            content: `Generate optimized hashtags for this video content: ${description}`,
+          },
+        ],
+        text: {
+          format: zodTextFormat(hashtag_schema, 'hashtags'),
+        },
+      })
+
+      return response.output_parsed
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_CONTENT)
+    }
+  }
+
+  async generate_optimized_copy({ description }: { description: string }) {
+    try {
+      const response = await this.client.responses.parse({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content: `You are an expert copywriter specializing in short-form video content optimization.
+
+Your task is to create engaging copy that maximizes engagement, retention, and conversion based on video content.
+
+## Copy Guidelines
+- Create compelling, hook-focused copy that grabs attention immediately
+- Include engaging description with clear call-to-action
+- Use power words that drive action
+- Create curiosity gaps to increase retention
+- Include questions to drive engagement
+- Add personality and authenticity
+- Keep it concise but impactful (max 500 characters total)
+
+## Copy Optimization Principles
+- Lead with strong value proposition or emotional hook
+- Use active voice and present tense
+- Include clear call-to-action
+- Create shareable, quotable moments
+- Drive specific actions (like, share, comment, follow)
+
+## Critical Instructions
+- Return only valid JSON in the specified format
+- Return copy as a single string (not title and description separately)
+- No markdown, explanations, or additional text
+- Copy should be engaging and authentic
+- Include strategic formatting and calls-to-action
+
+Example format: "🔥 This will change everything you know about... What do you think? Drop your thoughts below! 👇 #transformation"`,
+          },
+          {
+            role: 'user',
+            content: `Create optimized copy for this video content: ${description}`,
+          },
+        ],
+        text: {
+          format: zodTextFormat(optimized_copy_schema, 'copy'),
+        },
+      })
+
+      return response.output_parsed
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_CONTENT)
     }
   }
 }
