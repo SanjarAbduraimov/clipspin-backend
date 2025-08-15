@@ -62,6 +62,10 @@ export class ProjectResponseDTO {
   voice?: string
 
   @Expose()
+  @Transform(transform_object_id())
+  avatar?: string
+
+  @Expose()
   @Type(() => UserResponseDTO)
   user?: UserResponseDTO
 

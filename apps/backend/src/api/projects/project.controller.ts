@@ -25,6 +25,11 @@ import { ProjectResponseDTO } from './dto/response.dto'
 import { ProjectOutputDTO } from './dto/result.dto'
 import { UpdateProjectDTO } from './dto/update.dto'
 import { ProjectService } from './project.service'
+import { BadRequestError } from '../../common/errors/bad-request.error'
+import { HeygenAvatarService } from '../heygen-avatars/heygen-avatar.service'
+import { HeygenAvatarDocument } from '../../models/heygen-avatar.schema'
+import { isValidObjectId } from 'mongoose'
+import { HeygenAvatarController } from '../heygen-avatars/heygen-avatar.controller'
 
 @ApiBearerAuth()
 @ApiTags(ProjectController.resource_name)
@@ -36,6 +41,7 @@ export class ProjectController {
     private readonly user_subscription_service: UserSubscriptionService,
     private readonly subscription_plan_service: SubscriptionPlanService,
     private readonly heygen_voice_service: HeygenVoiceService,
+    private readonly heygen_avatar_service: HeygenAvatarService,
     private readonly queue: MainQueue,
   ) {}
 
@@ -104,7 +110,7 @@ export class ProjectController {
     @User() user: UserDocument,
   ) {
     let voice: HeygenVoiceDocument
-    console.log(body, 'body')
+    let avatar: HeygenAvatarDocument
 
     if (body.voice) {
       voice = await this.heygen_voice_service.retrieve(body.voice)
@@ -116,6 +122,25 @@ export class ProjectController {
       }
     }
 
+
+
+    const talking_head_validation = body.type == ProjectType.TALKING_HEAD && !isValidObjectId(body.avatar)
+    if (talking_head_validation) {
+      throw new BadRequestError(ProjectController.resource_name, {
+        id: body.avatar,
+      })
+    }
+
+
+    if (body.avatar) {
+      avatar = await this.heygen_avatar_service.retrieve(body.avatar)
+
+      if (!avatar) {
+        throw new NotFoundError(HeygenAvatarController.resource_name, {
+          id: body.avatar,
+        })
+      }
+    }
     const user_subscription = await this.user_subscription_service.find({
       user: user._id,
     })
@@ -169,9 +194,10 @@ export class ProjectController {
 
     const project = await this.project_service.create({
       ...body,
-      voice: voice?._id,
       user: ctx.user?._id,
+      voice: voice?._id,
       credit_usage,
+      avatar: avatar?._id
     })
 
     this.queue.analyze({ project_id: project._id })
@@ -287,9 +313,11 @@ export class ProjectController {
   @Post('/heygen/callback')
   @ResponseDTO(ProjectResponseDTO)
   async heygen_callback(@Body() body: any) {
+    const project_id = body.event_data?.callback_id
+
     if (body.event_type == 'avatar_video.success') {
       const project = await this.project_service.retrieve(
-        body.event_data.callback_id,
+        project_id,
       )
 
       if (project) {
@@ -297,7 +325,13 @@ export class ProjectController {
 
         this.queue.output({ project_id: project._id, video_url })
       }
+      return
     }
+
+    await this.project_service.update(project_id, {
+      status: ProjectStatus.FAILED,
+      error_cause: body.event_data?.msg
+    })
 
     return {}
   }

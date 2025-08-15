@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { Client } from 'creatomate'
 
 import {
+  ProjectErrorCause,
   SlideShowScene,
   TextAudiogramData,
 } from 'apps/backend/src/models/project.schema'

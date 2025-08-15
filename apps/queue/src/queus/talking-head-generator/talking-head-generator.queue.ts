@@ -6,7 +6,8 @@ import { Types } from 'mongoose'
 export const TALKING_HEAD_GENERATOR_QUEUE_NAME = 'talking-head-generator-queue'
 
 export enum TALKING_HEAD_GENERATOR_QUEUE_EVENTS {
-  GENERATE_SCRIPT = 'generate_script',
+  GENERATE_SCENES = 'generate_scene',
+  GENERATE_SCENE_IMAGE = 'generate_scene_image',
   GENERATE_VIDEO = 'generate_video',
 }
 
@@ -21,7 +22,10 @@ export class TalkingHeadGeneratorQueue {
   ) {}
 
   generate(data: GenerateTalkingHeadData) {
-    this.queue.add(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCRIPT, data)
+    this.queue.add(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCENES, data)
+  }
+  generate_scene_images(data: GenerateTalkingHeadData) {
+    this.queue.add(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCENE_IMAGE, data)
   }
 
   generate_video(data: GenerateTalkingHeadData) {

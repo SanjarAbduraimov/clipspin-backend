@@ -1,6 +1,69 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { ProjectErrorCause } from 'apps/backend/src/models/project.schema'
 import axios, { Axios } from 'axios'
+
+// Heygen Generate Video Interfaces
+export interface HeygenVoiceVariable {
+  name: string
+  type: 'voice'
+  properties: {
+    voice_id: string
+    locale: string | null
+  }
+}
+
+export interface HeygenAvatarVariable {
+  name: string
+  type: 'character'
+  properties: {
+    character_id: string
+    type: 'avatar'
+  }
+}
+
+export interface HeygenImageVariable {
+  name: string
+  type: 'image'
+  properties: {
+    url: string
+    asset_id: string | null
+    fit: 'none' | 'cover' | 'contain' | 'fill'
+  }
+}
+
+export interface HeygenTextVariable {
+  name: string
+  type: 'text'
+  properties: {
+    content: string
+  }
+}
+
+export type HeygenVariable = HeygenVoiceVariable | HeygenAvatarVariable | HeygenImageVariable | HeygenTextVariable
+
+export interface HeygenGenerateVideoRequest {
+  title: string
+  variables: Record<string, HeygenVariable>
+  test?: boolean
+  caption?: boolean
+  dimension: {
+    width: number
+    height: number
+  }
+}
+
+export interface HeygenGenerateVideoParams {
+  title: string
+  callback_id: string
+  variables?: Record<string, HeygenVariable>
+  dimension?: {
+    width: number
+    height: number
+  }
+  test?: boolean
+  caption?: boolean
+}
 
 @Injectable()
 export class HeygenService {
@@ -20,41 +83,22 @@ export class HeygenService {
   }
 
   async generate_video({
-    script,
+    title,
     callback_id,
-    voice_id,
-  }: {
-    title: string
-    script: string
-    callback_id: string
-    voice_id: string
-  }): Promise<any> {
+    variables,
+    dimension = { width: 720, height: 1280 },
+    test = false,
+    caption = false,
+  }: HeygenGenerateVideoParams): Promise<any> {
     try {
       const response = await this.client.post(
-        `/v2/template/23309bc49e3c4f9da72f34aab6b6108b/generate`,
+        `/v2/template/e26f26f58d574ef286ee5528116d7b44/generate`,
         {
-          caption: false,
-          title: 'TEST API',
-          variables: {
-            script_en: {
-              name: 'script_en',
-              type: 'text',
-              properties: {
-                content: script,
-              },
-            },
-            script_voice: {
-              name: 'script_voice',
-              type: 'voice',
-              properties: {
-                voice_id,
-              },
-            },
-          },
-          dimension: {
-            width: 720,
-            height: 1280,
-          },
+          caption,
+          title,
+          variables: variables,
+          dimension,
+          test,
           option: {
             remove_logo: true,
           },
@@ -62,7 +106,6 @@ export class HeygenService {
           callback_id,
         },
       )
-
       return response.data
     } catch (error) {
       throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_VIDEO)

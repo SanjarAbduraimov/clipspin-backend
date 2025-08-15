@@ -94,11 +94,13 @@ export class TextAudiogramData {
 }
 
 export class TalkingHeadData {
-  @Prop()
-  title?: string
+  // @Prop()
+  // title?: string
 
-  @Prop()
-  script?: string
+  // @Prop()
+  // script?: string
+  @Prop({ type: [SlideShowScene] })
+  scenes?: SlideShowScene[]
 }
 export class Veo3Data {
   @Prop()
@@ -186,6 +188,9 @@ export class Project {
 
   @Prop({ type: Types.ObjectId, ref: 'HeygenVoice' })
   voice?: Types.ObjectId
+
+  @Prop({ type: Types.ObjectId, ref: 'HeygenAvatar' })
+  avatar?: Types.ObjectId
 
   @Prop({
     type: String,

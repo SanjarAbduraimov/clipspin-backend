@@ -17,6 +17,7 @@ import { UserSubscriptionModule } from './api/user-subscriptions/user-subscripti
 import { UsersModule } from './api/users/users.module'
 import configuration from './config'
 import { LoggerMiddleware } from './middlewares/request-logger'
+import { HeygenAvatarModule } from './api/heygen-avatars/heygen-avatar.module'
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { LoggerMiddleware } from './middlewares/request-logger'
     CreditPackModule,
     UsersModule,
     HeygenVoiceModule,
+    HeygenAvatarModule
   ],
   controllers: [],
   providers: [

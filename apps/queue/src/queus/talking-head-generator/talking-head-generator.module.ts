@@ -10,6 +10,7 @@ import {
   TALKING_HEAD_GENERATOR_QUEUE_NAME,
   TalkingHeadGeneratorQueue,
 } from './talking-head-generator.queue'
+import { FalAIService } from '../../services/falai.service'
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import {
   providers: [
     OpenAIService,
     HeygenService,
+    FalAIService,
     TalkingHeadGeneratorQueue,
     TalkingHeadGeneratorQueueProcessor,
   ],

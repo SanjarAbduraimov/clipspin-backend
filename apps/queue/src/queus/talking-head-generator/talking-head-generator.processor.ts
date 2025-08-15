@@ -3,8 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { ApifyClient } from 'apify-client'
 import { Job } from 'bull'
 
-import { HeygenVoiceDocument } from 'apps/backend/src/models/heygen-voice.schema'
-import { ProjectProgress } from 'apps/backend/src/models/project.schema'
+import { ProjectProgress, SlideShowScene } from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
@@ -16,6 +15,9 @@ import {
   TALKING_HEAD_GENERATOR_QUEUE_NAME,
   TalkingHeadGeneratorQueue,
 } from './talking-head-generator.queue'
+import { HeygenAvatarDocument } from 'apps/backend/src/models/heygen-avatar.schema'
+import { FalAIService } from '../../services/falai.service'
+import { createHeygenVariablesFromTalkingHead } from '../../models/talking-head.interface'
 
 @Processor(TALKING_HEAD_GENERATOR_QUEUE_NAME)
 export class TalkingHeadGeneratorQueueProcessor {
@@ -25,6 +27,7 @@ export class TalkingHeadGeneratorQueueProcessor {
     private readonly config_service: ConfigService,
     private readonly project_service: ProjectService,
     private readonly openai_service: OpenAIService,
+    private readonly falai_service: FalAIService,
     private readonly heygen_service: HeygenService,
     private readonly talking_head_generator_queue: TalkingHeadGeneratorQueue,
   ) {
@@ -51,7 +54,8 @@ export class TalkingHeadGeneratorQueueProcessor {
     }
   }
 
-  @Process(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCRIPT)
+
+  @Process(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCENES)
   async generate_scenes(job: Job<GenerateTalkingHeadData>) {
     const project = await this.project_service.retrieve(job.data.project_id)
 
@@ -59,12 +63,48 @@ export class TalkingHeadGeneratorQueueProcessor {
       progress: ProjectProgress.GENERATING_SCRIPT,
     })
 
-    const script = await this.openai_service.generate_talking_head_script({
+    const scenes = await this.openai_service.generate_scenes({
       description: project.selected_idea.script,
     })
 
     await this.project_service.update(project.id, {
-      talking_head_data: script,
+      talking_head_data: {
+        scenes: scenes.filter(
+          (item) => item.image_prompt && item.voiceover_script,
+        ),
+      },
+      progress: ProjectProgress.SCRIPT_GENERATED,
+    })
+
+    this.talking_head_generator_queue.generate_scene_images({
+      project_id: project._id
+    })
+  }
+
+  @Process(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCENE_IMAGE)
+  async generate_images(job: Job<GenerateTalkingHeadData>) {
+    const project = await this.project_service.retrieve(job.data.project_id)
+
+    await this.project_service.update(project._id, {
+      progress: ProjectProgress.GENERATING_IMAGES,
+    })
+
+    const scenes: SlideShowScene[] = []
+
+    for (const scene of project.talking_head_data.scenes) {
+      const image = await this.falai_service.generate_image({
+        prompt: scene.image_prompt,
+      })
+
+      scenes.push({
+        ...scene,
+        image_url: image.url,
+      })
+    }
+
+    await this.project_service.update(project.id, {
+      talking_head_data: { scenes },
+      progress: ProjectProgress.IMAGES_GENERATED,
     })
 
     this.talking_head_generator_queue.generate_video({
@@ -75,20 +115,26 @@ export class TalkingHeadGeneratorQueueProcessor {
   @Process(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_VIDEO)
   async generate_video(job: Job<GenerateTalkingHeadData>) {
     const project = await this.project_service.retrieve(job.data.project_id, {
-      populate: 'voice',
+      populate: 'avatar',
     })
 
     await this.project_service.update(project._id, {
       progress: ProjectProgress.GENERATING_VIDEO,
     })
 
-    const voice = project.voice as unknown as HeygenVoiceDocument
+
+    const avatar = project.avatar as unknown as HeygenAvatarDocument
+
+    const variables = createHeygenVariablesFromTalkingHead(
+      project.talking_head_data,
+      avatar.default_voice_id,
+      avatar.avatar_id
+    )
 
     const video = await this.heygen_service.generate_video({
-      script: project.talking_head_data.script,
-      title: project.talking_head_data.title,
+      title: project.title,
       callback_id: project._id.toString(),
-      voice_id: voice.voice_id,
+      variables
     })
 
     await this.project_service.update(job.data.project_id, {

@@ -9,6 +9,7 @@ import { SubscriptionPlanModule } from '../subscription-plans/subscription-plan.
 import { UserSubscriptionModule } from '../user-subscriptions/user-subscription.module'
 import { ProjectController } from './project.controller'
 import { ProjectService } from './project.service'
+import { HeygenAvatarModule } from '../heygen-avatars/heygen-avatar.module'
 
 @Global()
 @Module({
@@ -23,6 +24,7 @@ import { ProjectService } from './project.service'
     SubscriptionPlanModule,
     UserSubscriptionModule,
     HeygenVoiceModule,
+    HeygenAvatarModule
   ],
   controllers: [ProjectController],
   providers: [ProjectService],
