@@ -11,6 +11,7 @@ export enum MAIN_QUEUE_EVENTS {
   PROCESS = 'process',
   GENERATE = 'generate',
   OUTPUT = 'output',
+  GENERATE_CONTENT = 'generate_content',
 }
 
 export interface MainQueueData {
@@ -31,5 +32,9 @@ export class MainQueue {
 
   output(data: OutputQueueData) {
     this.queue.add(MAIN_QUEUE_EVENTS.OUTPUT, data)
+  }
+
+  generate_content(data: MainQueueData) {
+    this.queue.add(MAIN_QUEUE_EVENTS.GENERATE_CONTENT, data)
   }
 }

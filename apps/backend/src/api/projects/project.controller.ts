@@ -218,6 +218,7 @@ export class ProjectController {
     }
 
     this.queue.generate({ project_id: project._id })
+    this.queue.generate_content({ project_id: project._id })
 
     return { data: project }
   }
