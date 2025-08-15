@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { ProjectErrorCause } from 'apps/backend/src/models/project.schema'
 import axios, { Axios } from 'axios'
+
+import { ProjectErrorCause } from 'apps/backend/src/models/project.schema'
 
 // Heygen Generate Video Interfaces
 export interface HeygenVoiceVariable {
@@ -40,7 +41,11 @@ export interface HeygenTextVariable {
   }
 }
 
-export type HeygenVariable = HeygenVoiceVariable | HeygenAvatarVariable | HeygenImageVariable | HeygenTextVariable
+export type HeygenVariable =
+  | HeygenVoiceVariable
+  | HeygenAvatarVariable
+  | HeygenImageVariable
+  | HeygenTextVariable
 
 export interface HeygenGenerateVideoRequest {
   title: string

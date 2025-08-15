@@ -47,7 +47,11 @@ export interface HeygenTextVariable {
   }
 }
 
-export type HeygenVariable = HeygenVoiceVariable | HeygenAvatarVariable | HeygenImageVariable | HeygenTextVariable
+export type HeygenVariable =
+  | HeygenVoiceVariable
+  | HeygenAvatarVariable
+  | HeygenImageVariable
+  | HeygenTextVariable
 
 export interface HeygenGenerateVideoRequest {
   title: string
@@ -79,28 +83,28 @@ export interface HeygenGenerateVideoParams {
 export function createHeygenVariablesFromTalkingHead(
   talkingHeadData: TalkingHeadData,
   voiceId: string,
-  avatarId: string
+  avatarId: string,
 ): Record<string, HeygenVariable> {
   const variables: Record<string, HeygenVariable> = {}
 
   // Add voice variable
   variables.voice = {
-    name: "voice",
-    type: "voice",
+    name: 'voice',
+    type: 'voice',
     properties: {
       voice_id: voiceId,
-      locale: null
-    }
+      locale: null,
+    },
   }
 
   // Add avatar variable
   variables.avatar = {
-    name: "avatar",
-    type: "character",
+    name: 'avatar',
+    type: 'character',
     properties: {
       character_id: avatarId,
-      type: "avatar"
-    }
+      type: 'avatar',
+    },
   }
 
   // Add image variables for each scene
@@ -108,12 +112,12 @@ export function createHeygenVariablesFromTalkingHead(
     if (scene.image_url) {
       variables[`image_${index + 1}`] = {
         name: `image_${index + 1}`,
-        type: "image",
+        type: 'image',
         properties: {
           url: scene.image_url,
           asset_id: null,
-          fit: "none"
-        }
+          fit: 'none',
+        },
       }
     }
   })
@@ -123,10 +127,10 @@ export function createHeygenVariablesFromTalkingHead(
     if (scene.voiceover_script) {
       variables[`script_${index + 1}`] = {
         name: `script_${index + 1}`,
-        type: "text",
+        type: 'text',
         properties: {
-          content: scene.voiceover_script
-        }
+          content: scene.voiceover_script,
+        },
       }
     }
   })

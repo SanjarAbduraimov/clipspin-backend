@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common'
 
 import { ProjectModule } from 'apps/backend/src/api/projects/project.module'
 
+import { FalAIService } from '../../services/falai.service'
 import { HeygenService } from '../../services/haygen.service'
 import { OpenAIService } from '../../services/openai.service'
 import { TalkingHeadGeneratorQueueProcessor } from './talking-head-generator.processor'
@@ -10,7 +11,6 @@ import {
   TALKING_HEAD_GENERATOR_QUEUE_NAME,
   TalkingHeadGeneratorQueue,
 } from './talking-head-generator.queue'
-import { FalAIService } from '../../services/falai.service'
 
 @Module({
   imports: [

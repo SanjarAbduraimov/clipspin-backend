@@ -3,10 +3,16 @@ import { ConfigService } from '@nestjs/config'
 import { ApifyClient } from 'apify-client'
 import { Job } from 'bull'
 
-import { ProjectProgress, SlideShowScene } from 'apps/backend/src/models/project.schema'
+import { HeygenAvatarDocument } from 'apps/backend/src/models/heygen-avatar.schema'
+import {
+  ProjectProgress,
+  SlideShowScene,
+} from 'apps/backend/src/models/project.schema'
 
 import { ProjectService } from 'apps/backend/src/api/projects/project.service'
 
+import { createHeygenVariablesFromTalkingHead } from '../../models/talking-head.interface'
+import { FalAIService } from '../../services/falai.service'
 import { HeygenService } from '../../services/haygen.service'
 import { OpenAIService } from '../../services/openai.service'
 import {
@@ -15,9 +21,6 @@ import {
   TALKING_HEAD_GENERATOR_QUEUE_NAME,
   TalkingHeadGeneratorQueue,
 } from './talking-head-generator.queue'
-import { HeygenAvatarDocument } from 'apps/backend/src/models/heygen-avatar.schema'
-import { FalAIService } from '../../services/falai.service'
-import { createHeygenVariablesFromTalkingHead } from '../../models/talking-head.interface'
 
 @Processor(TALKING_HEAD_GENERATOR_QUEUE_NAME)
 export class TalkingHeadGeneratorQueueProcessor {
@@ -54,7 +57,6 @@ export class TalkingHeadGeneratorQueueProcessor {
     }
   }
 
-
   @Process(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCENES)
   async generate_scenes(job: Job<GenerateTalkingHeadData>) {
     const project = await this.project_service.retrieve(job.data.project_id)
@@ -77,7 +79,7 @@ export class TalkingHeadGeneratorQueueProcessor {
     })
 
     this.talking_head_generator_queue.generate_scene_images({
-      project_id: project._id
+      project_id: project._id,
     })
   }
 
@@ -122,19 +124,18 @@ export class TalkingHeadGeneratorQueueProcessor {
       progress: ProjectProgress.GENERATING_VIDEO,
     })
 
-
     const avatar = project.avatar as unknown as HeygenAvatarDocument
 
     const variables = createHeygenVariablesFromTalkingHead(
       project.talking_head_data,
       avatar.default_voice_id,
-      avatar.avatar_id
+      avatar.avatar_id,
     )
 
     const video = await this.heygen_service.generate_video({
       title: project.title,
       callback_id: project._id.toString(),
-      variables
+      variables,
     })
 
     await this.project_service.update(job.data.project_id, {

@@ -23,12 +23,13 @@ export class HeygenAvatarController {
   @Get('/')
   @ResponseDTO(HeygenAvatarResponseDTO)
   async getAll(@GetContext() ctx: Context) {
-    const { data: heygen_avatars, total } = await this.heygen_avatar_service.list(
-      {
-        status: EntityStatus.ACTIVE,
-      },
-      ctx,
-    )
+    const { data: heygen_avatars, total } =
+      await this.heygen_avatar_service.list(
+        {
+          status: EntityStatus.ACTIVE,
+        },
+        ctx,
+      )
 
     return { data: heygen_avatars, total }
   }
@@ -36,7 +37,10 @@ export class HeygenAvatarController {
   @Get('/:id')
   @ResponseDTO(HeygenAvatarResponseDTO)
   async get(@GetContext() ctx: Context, @Param('id') id: string) {
-    const heygen_avatar = await this.heygen_avatar_service.find({ _id: id }, ctx)
+    const heygen_avatar = await this.heygen_avatar_service.find(
+      { _id: id },
+      ctx,
+    )
 
     if (!heygen_avatar) {
       throw new NotFoundError(HeygenAvatarController.resource_name, {

@@ -25,7 +25,10 @@ export class TalkingHeadGeneratorQueue {
     this.queue.add(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCENES, data)
   }
   generate_scene_images(data: GenerateTalkingHeadData) {
-    this.queue.add(TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCENE_IMAGE, data)
+    this.queue.add(
+      TALKING_HEAD_GENERATOR_QUEUE_EVENTS.GENERATE_SCENE_IMAGE,
+      data,
+    )
   }
 
   generate_video(data: GenerateTalkingHeadData) {

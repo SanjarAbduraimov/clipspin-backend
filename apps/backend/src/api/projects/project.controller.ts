@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { isValidObjectId } from 'mongoose'
 
 import { MainQueue } from 'apps/queue/src/queus/main-queue/main-queue.queue'
 
@@ -10,10 +11,14 @@ import { ResponseDTO } from '../../common/decarators/response.decarator'
 import { AllowedRoles } from '../../common/decarators/role.decarator'
 import { User } from '../../common/decarators/user.decarator'
 import { UserRole } from '../../common/enums/role.enum'
+import { BadRequestError } from '../../common/errors/bad-request.error'
 import { NotFoundError } from '../../common/errors/not-fount.error'
+import { HeygenAvatarDocument } from '../../models/heygen-avatar.schema'
 import { HeygenVoiceDocument } from '../../models/heygen-voice.schema'
 import { ProjectStatus, ProjectType } from '../../models/project.schema'
 import { UserDocument } from '../../models/user.schema'
+import { HeygenAvatarController } from '../heygen-avatars/heygen-avatar.controller'
+import { HeygenAvatarService } from '../heygen-avatars/heygen-avatar.service'
 import { HeygenVoiceController } from '../heygen-voices/heygen-voice.controller'
 import { HeygenVoiceService } from '../heygen-voices/heygen-voice.service'
 import { SubscriptionPlanController } from '../subscription-plans/subscription-plan.controller'
@@ -25,11 +30,6 @@ import { ProjectResponseDTO } from './dto/response.dto'
 import { ProjectOutputDTO } from './dto/result.dto'
 import { UpdateProjectDTO } from './dto/update.dto'
 import { ProjectService } from './project.service'
-import { BadRequestError } from '../../common/errors/bad-request.error'
-import { HeygenAvatarService } from '../heygen-avatars/heygen-avatar.service'
-import { HeygenAvatarDocument } from '../../models/heygen-avatar.schema'
-import { isValidObjectId } from 'mongoose'
-import { HeygenAvatarController } from '../heygen-avatars/heygen-avatar.controller'
 
 @ApiBearerAuth()
 @ApiTags(ProjectController.resource_name)
@@ -122,15 +122,13 @@ export class ProjectController {
       }
     }
 
-
-
-    const talking_head_validation = body.type == ProjectType.TALKING_HEAD && !isValidObjectId(body.avatar)
+    const talking_head_validation =
+      body.type == ProjectType.TALKING_HEAD && !isValidObjectId(body.avatar)
     if (talking_head_validation) {
       throw new BadRequestError(ProjectController.resource_name, {
         id: body.avatar,
       })
     }
-
 
     if (body.avatar) {
       avatar = await this.heygen_avatar_service.retrieve(body.avatar)
@@ -197,7 +195,7 @@ export class ProjectController {
       user: ctx.user?._id,
       voice: voice?._id,
       credit_usage,
-      avatar: avatar?._id
+      avatar: avatar?._id,
     })
 
     this.queue.analyze({ project_id: project._id })
@@ -316,9 +314,7 @@ export class ProjectController {
     const project_id = body.event_data?.callback_id
 
     if (body.event_type == 'avatar_video.success') {
-      const project = await this.project_service.retrieve(
-        project_id,
-      )
+      const project = await this.project_service.retrieve(project_id)
 
       if (project) {
         const video_url = body.event_data.url
@@ -330,7 +326,7 @@ export class ProjectController {
 
     await this.project_service.update(project_id, {
       status: ProjectStatus.FAILED,
-      error_cause: body.event_data?.msg
+      error_cause: body.event_data?.msg,
     })
 
     return {}

@@ -25,6 +25,4 @@ export class CreateHeygenAvatarDTO {
 
   @IsBoolean()
   premium: boolean
-
-
 }
