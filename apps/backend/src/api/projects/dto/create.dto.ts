@@ -33,5 +33,5 @@ export class CreateProjectDTO {
 
   @IsOptional()
   @IsMongoId()
-  voice?: string
+  avatar?: string
 }

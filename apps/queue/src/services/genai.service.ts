@@ -141,7 +141,6 @@ Avoid using emojis, video directions, or any kind of markup. Return only the raw
         },
       },
     })
-
     const analysis = JSON.parse(response.text)
 
     return Object.values(analysis).map((value) => ({ script: value as string }))

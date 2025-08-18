@@ -64,8 +64,8 @@ export class ProjectResponseDTO {
   error_cause: string
 
   @Expose()
-  @Transform(transform_object_id())
-  voice?: string
+  @Transform(transform_object_id('avatar'))
+  avatar?: string
 
   @Expose()
   @Type(() => UserResponseDTO)

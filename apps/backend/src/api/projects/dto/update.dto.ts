@@ -25,5 +25,5 @@ export class UpdateProjectDTO {
 
   @IsOptional()
   @IsMongoId()
-  voice?: string
+  avatar?: string
 }

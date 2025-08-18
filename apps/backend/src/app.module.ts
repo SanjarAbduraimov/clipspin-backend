@@ -9,6 +9,7 @@ import { AuthGuard } from './api/auth/auth.guard'
 import { AuthModule } from './api/auth/auth.module'
 import { CreditPackModule } from './api/credit-packs/credit-pack.module'
 import { FileModule } from './api/files/file.module'
+import { HeygenAvatarModule } from './api/heygen-avatars/heygen-avatar.module'
 import { HeygenVoiceModule } from './api/heygen-voices/heygen-voice.module'
 import { ProfileModule } from './api/profile/profile.module'
 import { ProjectModule } from './api/projects/project.module'
@@ -68,6 +69,7 @@ import { LoggerMiddleware } from './middlewares/request-logger'
     CreditPackModule,
     UsersModule,
     HeygenVoiceModule,
+    HeygenAvatarModule,
   ],
   controllers: [],
   providers: [

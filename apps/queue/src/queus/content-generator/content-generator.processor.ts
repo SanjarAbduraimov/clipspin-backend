@@ -45,8 +45,8 @@ export class ContentGeneratorProcessor {
         .join(' ')
     } else if (project.text_audiogram_data?.quote_text) {
       description = project.text_audiogram_data.quote_text
-    } else if (project.talking_head_data?.script) {
-      description = project.talking_head_data.script
+    } else if (project.talking_head_data?.scenes[0].voiceover_script) {
+      description = project.talking_head_data.scenes[0].voiceover_script
     } else if (project.veo3_data?.script) {
       description = project.veo3_data.script
     } else {
