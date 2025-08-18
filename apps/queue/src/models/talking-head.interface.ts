@@ -116,7 +116,7 @@ export function createHeygenVariablesFromTalkingHead(
         properties: {
           url: scene.image_url,
           asset_id: null,
-          fit: 'none',
+          fit: 'cover',
         },
       }
     }

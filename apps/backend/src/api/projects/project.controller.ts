@@ -14,7 +14,6 @@ import { UserRole } from '../../common/enums/role.enum'
 import { BadRequestError } from '../../common/errors/bad-request.error'
 import { NotFoundError } from '../../common/errors/not-fount.error'
 import { HeygenAvatarDocument } from '../../models/heygen-avatar.schema'
-import { HeygenVoiceDocument } from '../../models/heygen-voice.schema'
 import { ProjectStatus, ProjectType } from '../../models/project.schema'
 import { UserDocument } from '../../models/user.schema'
 import { HeygenAvatarController } from '../heygen-avatars/heygen-avatar.controller'
@@ -68,7 +67,7 @@ export class ProjectController {
   async list(@GetContext() ctx: Context, @QueryFilter() filter: any) {
     const { data: projects, total } = await this.project_service.list(filter, {
       ...ctx,
-      populate: 'user voice',
+      populate: 'user avatar',
     })
 
     return { data: projects, total }
@@ -109,18 +108,7 @@ export class ProjectController {
     @GetContext() ctx: Context,
     @User() user: UserDocument,
   ) {
-    let voice: HeygenVoiceDocument
     let avatar: HeygenAvatarDocument
-
-    if (body.voice) {
-      voice = await this.heygen_voice_service.retrieve(body.voice)
-
-      if (!voice) {
-        throw new NotFoundError(HeygenVoiceController.resource_name, {
-          id: body.voice,
-        })
-      }
-    }
 
     const talking_head_validation =
       body.type == ProjectType.TALKING_HEAD && !isValidObjectId(body.avatar)
@@ -193,9 +181,8 @@ export class ProjectController {
     const project = await this.project_service.create({
       ...body,
       user: ctx.user?._id,
-      voice: voice?._id,
-      credit_usage,
       avatar: avatar?._id,
+      credit_usage,
     })
 
     this.queue.analyze({ project_id: project._id })
@@ -255,14 +242,14 @@ export class ProjectController {
     @Param('id') id: string,
     @Body() body: UpdateProjectDTO,
   ) {
-    let voice: HeygenVoiceDocument
+    let avatar: HeygenAvatarDocument
 
-    if (body.voice) {
-      voice = await this.heygen_voice_service.retrieve(body.voice)
+    if (body.avatar) {
+      avatar = await this.heygen_avatar_service.retrieve(body.avatar)
 
-      if (!voice) {
+      if (!avatar) {
         throw new NotFoundError(HeygenVoiceController.resource_name, {
-          id: body.voice,
+          id: body.avatar,
         })
       }
     }
@@ -282,7 +269,7 @@ export class ProjectController {
       id,
       {
         ...body,
-        voice: voice?._id,
+        avatar: avatar?._id,
       },
       ctx,
     )

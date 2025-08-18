@@ -117,7 +117,6 @@ export class AuthController {
     { email, password }: LoginDTO,
   ) {
     const user = await this.authService.getUserByEmail(email)
-    console.log(user, 'user in login', password)
 
     if (!user) {
       throw new BadRequestException('invalid username or password')
