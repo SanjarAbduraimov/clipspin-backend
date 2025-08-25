@@ -4,6 +4,12 @@ import { ConfigService } from '@nestjs/config'
 
 import { ProjectErrorCause } from 'apps/backend/src/models/project.schema'
 
+export interface Keyframe {
+  url: string
+  timestamp: number
+  duration: number
+}
+
 @Injectable()
 export class FalAIService {
   client: FalClient
@@ -32,20 +38,64 @@ export class FalAIService {
       throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCENES)
     }
   }
-  async generate_video({ prompt }: { prompt: string }) {
+  async generate_veo3_video({ prompt }: { prompt: string }) {
     try {
-      const response = await this.client.subscribe('fal-ai/veo3', {
+      const response = await this.client.subscribe('fal-ai/veo3/fast', {
         input: {
           prompt,
+          aspect_ratio: '9:16',
+          duration: '8s',
+          enhance_prompt: true,
+          auto_fix: true,
+          resolution: '720p',
+          generate_audio: true,
+        },
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === 'IN_PROGRESS') {
+            update.logs.map((log) => log.message).forEach(console.log)
+          }
+        },
+      })
+
+      return response.data.video
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_VEO3_VIDEO)
+    }
+  }
+
+  async compose_video({
+    id,
+    keyframes,
+  }: {
+    id: string
+    keyframes: Keyframe[]
+  }) {
+    try {
+      const response = await this.client.subscribe(
+        'fal-ai/ffmpeg-api/compose',
+        {
+          input: {
+            tracks: [
+              {
+                id,
+                type: 'video',
+                keyframes,
+              },
+            ],
+          },
           logs: true,
-          onQueueUpdate: (update: { status: string; logs: any[] }) => {
+          onQueueUpdate: (update) => {
             if (update.status === 'IN_PROGRESS') {
               update.logs.map((log) => log.message).forEach(console.log)
             }
           },
         },
-      })
-      return response.data.video
+      )
+      return {
+        video_url: response.data.video_url,
+        request_id: response.requestId,
+      }
     } catch (error) {
       throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_VIDEO)
     }

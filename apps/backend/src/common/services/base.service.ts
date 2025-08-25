@@ -74,6 +74,13 @@ export class BaseService<T> {
     return document
   }
 
+  async updateOne(
+    filter: Record<string, any>,
+    data: Record<string, any>,
+  ): Promise<HydratedDocument<T> | null> {
+    return this.model.findOneAndUpdate(filter, { $set: data }, { new: true })
+  }
+
   async delete(id: string | Types.ObjectId): Promise<boolean> {
     await this.model.findByIdAndDelete(id)
 

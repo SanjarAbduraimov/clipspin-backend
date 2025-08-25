@@ -47,8 +47,8 @@ export class ContentGeneratorProcessor {
       description = project.text_audiogram_data.quote_text
     } else if (project.talking_head_data?.scenes[0].voiceover_script) {
       description = project.talking_head_data.scenes[0].voiceover_script
-    } else if (project.veo3_data?.script) {
-      description = project.veo3_data.script
+    } else if (project.veo3_data?.scenes[0].video_prompt) {
+      description = project.veo3_data.scenes[0].video_prompt
     } else {
       throw new Error('No content found to generate hashtags from')
     }

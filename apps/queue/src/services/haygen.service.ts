@@ -93,7 +93,7 @@ export class HeygenService {
     variables,
     dimension = { width: 720, height: 1280 },
     test = false,
-    caption = false,
+    caption = true,
   }: HeygenGenerateVideoParams): Promise<any> {
     try {
       const response = await this.client.post(
@@ -111,6 +111,7 @@ export class HeygenService {
           callback_id,
         },
       )
+
       return response.data
     } catch (error) {
       throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_VIDEO)
