@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 
 import { UserRole } from '../../common/enums/role.enum'
+import { NotFoundError } from '../../common/errors/not-fount.error'
 import { BaseService } from '../../common/services/base.service'
 import { User } from '../../models/user.schema'
 import { UserSubscriptionService } from '../user-subscriptions/user-subscription.service'
@@ -32,7 +33,7 @@ export class UsersService extends BaseService<User> {
     })
 
     if (!user_subscription) {
-      throw new Error('User subscription not found')
+      throw new NotFoundError('user_subscription')
     }
 
     const increment_amount =

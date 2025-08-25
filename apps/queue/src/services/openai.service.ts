@@ -16,6 +16,20 @@ const slide_show_scenes_schema = z.object({
     }),
   ),
 })
+const veo3_scenes_schema = z.object({
+  video_prompt: z.string().min(10).max(500),
+})
+const veo3_elements_schema = z.object({
+  scenes: z.array(
+    z.object({
+      elementA: z.string().min(3).max(500),
+      elementB: z.string().min(3).max(500),
+      elementC: z.string().min(3).max(500),
+      elementD: z.string().min(3).max(500),
+      elementE: z.string().min(3).max(500),
+    }),
+  ),
+})
 
 const text_audigram_script_schema = z.object({
   quote_text: z.string(),
@@ -158,6 +172,189 @@ json
         },
       })
 
+      return response.output_parsed.scenes
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCRIPTS)
+    }
+  }
+
+  async generate_veo3_scenes({
+    elementA,
+    elementB,
+    elementC,
+    elementD,
+    elementE,
+  }: {
+    elementA?: string
+    elementB?: string
+    elementC?: string
+    elementD?: string
+    elementE?: string
+  }) {
+    try {
+      const response = await this.client.responses.parse({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content: `system_prompt: |
+  You are a precision prompt generator for realistic, cinematic AI video scenes.
+
+  ***
+
+  Each time you're called, you will receive five dynamic inputs:
+
+  elementA: scene setting is ${elementA}
+  elementB: character is ${elementB}
+  elementC: action is ${elementC}
+  elementD: style is ${elementD}
+  elementE: script is ${elementE}
+
+  ***
+
+  Your job is to take these values and insert them into the following template exactly, replacing the corresponding words. Do not use curly brackets or add extra formatting. Do not explain anything.
+
+  ***
+  FINAL VIDEO PROMPT
+
+  Return the result as a single JSON object with this structure:
+
+  {
+    "video_prompt": "A [character] is seen [action] in a [scene setting]. The visual style is [style]. The voiceover says: '[script]'. The scene is shot using 3-point lighting with soft diffusion, captured on a Canon EOS R5, 85mm lens at f/2.0 with steady glidecam motion."
+  }
+
+  Replace the values in square brackets with the actual inputs. Do not include square brackets or quotes around the values in the final result.
+
+  Output only the final JSON. Nothing else.
+
+  Use the Think tool to review your output.`,
+          },
+          {
+            role: 'user',
+            content: `Generate a scene`,
+          },
+        ],
+        text: {
+          format: zodTextFormat(veo3_scenes_schema, 'scene'),
+        },
+      })
+      return response.output_parsed
+    } catch (error) {
+      throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCRIPTS)
+    }
+  }
+  async generate_veo3_elements({
+    description,
+    scene_count = 2,
+  }: {
+    description: string
+    scene_count?: number
+  }) {
+    try {
+      const response = await this.client.responses.parse({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content: `system_prompt: |
+  Use the Think tool to carefully generate your output.
+
+  You are an expert visual prompt generator for motivational and cinematic AI video scenes.
+
+  ***
+
+  YOUR ROLE
+  is to generate meaningful and inspiring scenes from motivational scripts. You do this by selecting one value from each of the following five elements:
+
+  - Element A = Scene Setting
+  - Element B = Character Type
+  - Element C = Action or Visual Movement
+  - Element D = Visual Style / Tone
+  - Element E = Voiceover Script
+
+  ***
+
+  Construct a structured JSON that includes:
+
+  A title that is short (max 7 words), vivid, and engaging — it should clearly hint at the theme or power of the video.
+
+  A caption that is casual, personal, and inspiring. Include 1 emoji and 2 hashtags related to the topic or mood.
+
+  A list of ${scene_count} scenes, where each scene includes the following five elements:
+
+  Your output must follow this format in valid JSON:
+
+  {
+    "title": "Compelling short title here",
+    "caption": "Short human caption with 1 emoji and 2 hashtags",
+    "scenes": [
+      {
+        "elementA": "",
+        "elementB": "",
+        "elementC": "",
+        "elementD": "",
+        "elementE": ""
+      }
+    ]
+  }
+
+  ***
+
+  Use these value pools for each element:
+
+  Scene Setting (elementA):
+  - Rooftop at sunrise
+  - Gym with punching bag
+  - Crowded subway platform
+  - Beach at sunset
+  - Minimalist office
+  - Random scene
+
+  Character Type (elementB):
+  - Focused young woman
+  - Elderly man jogging
+  - Teenager writing in notebook
+  - Businessperson pacing
+  - Street artist painting
+  - Random character
+
+  Action or Visual Movement (elementC):
+  - Running up stairs
+  - Looking into mirror
+  - Scribbling ideas on wall
+  - Pushing heavy object
+  - Standing still, breathing deep
+  - Random action
+
+  Visual Style / Tone (elementD):
+  - Gritty realism, handheld camera
+  - Slow motion, cinematic
+  - Time-lapse with music overlay
+  - High contrast black & white
+  - Vivid colors with shallow depth of field
+  - Random style
+
+  Voiceover Script (elementE):
+  - Lines selected from dynamic motivational scripts such as:
+    "Stop waiting for a sign. You're not a lottery ticket. Winners make their own luck..."
+    (or other variations)
+
+  ***
+
+  Rules:
+  - Do not include extra formatting or explanation.
+  - Return only the JSON object.`,
+          },
+          {
+            role: 'user',
+            content: `Generate only ${scene_count} scenes
+            Content Script:${description}}`,
+          },
+        ],
+        text: {
+          format: zodTextFormat(veo3_elements_schema, 'scenes'),
+        },
+      })
       return response.output_parsed.scenes
     } catch (error) {
       throw new Error(ProjectErrorCause.FAILED_TO_GENERATE_SCRIPTS)

@@ -40,6 +40,9 @@ export enum ProjectProgress {
   GENERATING_IMAGES = 'generating_images',
   IMAGES_GENERATED = 'images_generated',
 
+  GENERATING_VEO3 = 'generating_veo3',
+  VEO3_GENERATED = 'veo3_generated',
+
   GENERATING_VIDEO = 'generating_video',
   VIDEO_GENERATED = 'video_generated',
 
@@ -55,6 +58,7 @@ export enum ProjectErrorCause {
   FAILED_TO_PARSE = 'failed_to_parse',
   FAILED_TO_ANALYZE = 'failed_to_analyze',
   FAILED_TO_GENERATE_VIDEO = 'failed_to_generate_video',
+  FAILED_TO_GENERATE_VEO3_VIDEO = 'failed_to_generate_veo3_video',
   FAILED_TO_GENERATE_CONTENT = 'failed_to_generate_content',
   FAILED_TO_GENERATE_SCENES = 'failed_to_generate_scenes',
   FAILED_TO_GENERATE_SCRIPTS = 'failed_to_generate_scripts',
@@ -74,10 +78,27 @@ export class SlideShowScene {
   @Prop()
   image_url?: string
 }
+export class Veo3Scene {
+  @Prop()
+  scene_number?: number
+
+  @Prop()
+  success?: boolean
+
+  @Prop()
+  video_prompt?: string
+
+  @Prop()
+  video_url?: string
+}
 
 export class SlideShowData {
   @Prop({ type: [SlideShowScene] })
   scenes?: SlideShowScene[]
+}
+export class Veo3Data {
+  @Prop({ type: [Veo3Scene] })
+  scenes?: Veo3Scene[]
 }
 
 export class TextAudiogramData {
@@ -103,13 +124,13 @@ export class TalkingHeadData {
   @Prop({ type: [SlideShowScene] })
   scenes?: SlideShowScene[]
 }
-export class Veo3Data {
-  @Prop()
-  title?: string
+// export class Veo3Data {
+//   @Prop()
+//   title?: string
 
-  @Prop()
-  script?: string
-}
+//   @Prop()
+//   script?: string
+// }
 
 export class ProjectOutput {
   @Prop()
